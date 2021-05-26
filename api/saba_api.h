@@ -29,33 +29,42 @@
 extern "C" {
 #endif
 
-enum SABA_RESULT { SUCCESSFUL, FAILED };
+class SabaResult {
+public:
+  enum { SUCCESSFUL, FAILED };
+  static const char *getstring(int err) {
+    switch (err) {
+    case SabaResult::SUCCESSFUL:
+      return "Successful";
+    case SabaResult::FAILED:
+      return "Failed";
+    default:
+      return "No such error number";
+    }
+  }
+};
 
 // Application
-SABA_RESULT saba_app_register(const char *application_name,
-                              uint32_t *application_fd);
-SABA_RESULT saba_app_deregister(const uint32_t *application_fd);
+int saba_app_register(const char *application_name, uint32_t *application_fd);
+int saba_app_deregister(uint32_t *application_fd);
 
 // Connection
-SABA_RESULT saba_connection_create(uint32_t *connection_fd,
-                                   const char *destination_ip, int32_t port,
-                                   const uint32_t *application_fd);
-SABA_RESULT saba_connection_destroy(int connection_fd);
-SABA_RESULT saba_connection_establish(int connection_fd);
+int saba_connection_create(uint32_t *connection_fd, const char *destination_ip,
+                           int16_t port, const uint32_t *application_fd);
+int saba_connection_destroy(int connection_fd);
+int saba_connection_establish(int connection_fd);
 
 // Memory
-SABA_RESULT saba_memory_allocate(int connection_fd, uint8_t *memory,
-                                 uint32_t len);
-SABA_RESULT saba_memory_free(int connection_fd, uint8_t *memory,
-                                   uint32_t len);
+int saba_memory_allocate(int connection_fd, uint8_t **memory, uint32_t len);
+int saba_memory_free(int connection_fd, uint8_t **memory, uint32_t len);
 
 // Exchange data
-SABA_RESULT saba_write(int connection_fd, uint8_t *memory, uint32_t len);
-SABA_RESULT saba_read(int connection_fd, uint8_t *memory, uint32_t len);
+int saba_write(int connection_fd, uint8_t *memory, uint32_t len);
+int saba_read(int connection_fd, uint8_t *memory, uint32_t len);
 
 // Error message
-void saba_result_getstring(SABA_RESULT result, char* result_str);
-void saba_result_print(SABA_RESULT result, char* result_str);
+void saba_result_getstring(int result, char *result_str);
+void saba_result_print(int result, char *result_str);
 
 #ifdef __cplusplus
 }

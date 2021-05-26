@@ -187,6 +187,6 @@ int saba_read(int connection_fd, uint8_t *memory, uint32_t len) {
 // Error message
 void saba_result_getstring(int result, char *result_str) {}
 
-void saba_result_print(int result, char *result_str) {
+void saba_result_print(int result) {
   std::printf("Error: %s\n", SocketResult::getstring(result));
 }

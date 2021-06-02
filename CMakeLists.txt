@@ -36,3 +36,7 @@ endif()
 if(NOT DEFINED ENV{SABA_NO_WORKLOAD})
 	add_subdirectory(workload)
 endif()
+
+if(NOT DEFINED ENV{SABA_NO_TEST})
+	add_subdirectory(test)
+endif()

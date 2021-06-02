@@ -131,7 +131,7 @@ int saba_connection_create(uint32_t *connection_fd, const char *destination_ip,
   return SocketResult::SUCCESSFUL;
 }
 
-int saba_connection_destroy(int connection_fd) {
+int saba_connection_destroy(uint32_t connection_fd) {
   if (sockets.size() <= connection_fd) {
     return SocketResult::SOCKET_INVALID_FD;
   }
@@ -139,7 +139,7 @@ int saba_connection_destroy(int connection_fd) {
   return SocketResult::SUCCESSFUL;
 }
 
-int saba_connection_establish(int connection_fd) {
+int saba_connection_establish(uint32_t connection_fd) {
   if (sockets.size() <= connection_fd) {
     return SocketResult::SOCKET_INVALID_FD;
   }
@@ -147,7 +147,7 @@ int saba_connection_establish(int connection_fd) {
 }
 
 // Memory
-int saba_memory_allocate(int connection_fd, uint8_t **memory, uint32_t len) {
+int saba_memory_allocate(uint32_t connection_fd, uint8_t **memory, uint32_t len) {
 
   if (sockets.size() <= connection_fd) {
     return SocketResult::SOCKET_INVALID_FD;
@@ -159,7 +159,7 @@ int saba_memory_allocate(int connection_fd, uint8_t **memory, uint32_t len) {
   return SocketResult::SUCCESSFUL;
 }
 
-int saba_memory_free(int connection_fd, uint8_t **memory, uint32_t len) {
+int saba_memory_free(uint32_t connection_fd, uint8_t **memory, uint32_t len) {
 
   if (sockets.size() <= connection_fd) {
     return SocketResult::SOCKET_INVALID_FD;
@@ -169,7 +169,7 @@ int saba_memory_free(int connection_fd, uint8_t **memory, uint32_t len) {
 }
 
 // Exchange data
-int saba_write(int connection_fd, uint8_t *memory, uint32_t len) {
+int saba_write(uint32_t connection_fd, uint8_t *memory, uint32_t len) {
 
   if (sockets.size() <= connection_fd) {
     return SocketResult::SOCKET_INVALID_FD;
@@ -177,7 +177,7 @@ int saba_write(int connection_fd, uint8_t *memory, uint32_t len) {
   return sockets[connection_fd]->send_data((char *)memory, len);
 }
 
-int saba_read(int connection_fd, uint8_t *memory, uint32_t len) {
+int saba_read(uint32_t connection_fd, uint8_t *memory, uint32_t len) {
   if (sockets.size() <= connection_fd) {
     return SocketResult::SOCKET_INVALID_FD;
   }

@@ -52,7 +52,9 @@ int saba_app_deregister(uint32_t *application_fd);
 int saba_connection_create(uint32_t *connection_fd, const char *destination_ip,
                            int16_t port, const uint32_t *application_fd);
 int saba_connection_destroy(uint32_t connection_fd);
-int saba_connection_establish(int connection_fd);
+int saba_connection_establish(uint32_t connection_fd);
+int saba_connection_create_server(uint32_t connection_fd, const char *local_ip,
+                           int16_t port, const uint32_t *application_fd);
 
 // Memory
 int saba_memory_allocate(uint32_t connection_fd, uint8_t **memory, uint32_t len);

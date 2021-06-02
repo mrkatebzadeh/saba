@@ -34,6 +34,9 @@ public:
   enum {
     SOCKET_INVALID_FD = 10,
     SOCKET_CREATE_FAILED,
+    SOCKET_BIND_FAILED,
+    SOCKET_LISTEN_FAILED,
+    SOCKET_ACCEPT_FAILED,
     SOCKET_CONNECT_FAILED,
     SOCKET_SEND_FAILED,
     SOCKET_RECV_FAILED,
@@ -45,6 +48,12 @@ public:
       return "Socket invalid fd";
     case SOCKET_CREATE_FAILED:
       return "Socket create failed";
+    case SOCKET_BIND_FAILED:
+      return "Socket bind failed";
+    case SOCKET_LISTEN_FAILED:
+      return "Socket listen failed";
+    case SOCKET_ACCEPT_FAILED:
+      return "Socket accept failed";
     case SOCKET_CONNECT_FAILED:
       return "Socket connect failed";
     case SOCKET_SEND_FAILED:
@@ -78,6 +87,31 @@ public:
     this->destination.sin_port = htons(port);
 
     this->valid = false;
+    return SocketResult::SUCCESSFUL;
+  }
+
+  int get_server_socket() {
+    int opt = 1;
+    int new_socket;
+    int addrlen = sizeof(this->destination);
+
+    if (setsockopt(this->socket_desc, SOL_SOCKET, SO_REUSEADDR | SO_REUSEPORT,
+                   &opt, sizeof(opt))) {
+      return SocketResult::SOCKET_CREATE_FAILED;
+    }
+    if (bind(this->socket_desc, (struct sockaddr *)&this->destination,
+             sizeof(this->destination)) < 0) {
+      return SocketResult::SOCKET_CREATE_FAILED;
+    }
+    if (listen(this->socket_desc, 1) < 0) {
+      return SocketResult::SOCKET_CREATE_FAILED;
+    }
+    if ((new_socket =
+             accept(this->socket_desc, (struct sockaddr *)&this->destination,
+                    (socklen_t *)&addrlen)) < 0) {
+      return SocketResult::SOCKET_CREATE_FAILED;
+    }
+    this->socket_desc = new_socket;
     return SocketResult::SUCCESSFUL;
   }
 
@@ -146,8 +180,22 @@ int saba_connection_establish(uint32_t connection_fd) {
   return sockets[connection_fd]->connect_socket();
 }
 
+int saba_connection_create_server(uint32_t *connection_fd,
+                                  const char *destination_ip, int16_t port,
+                                  const uint32_t *application_fd) {
+  *connection_fd = sockets.size();
+  auto new_socket = new SocketConnection();
+  if (int err = new_socket->create_socket(destination_ip, port) !=
+                SocketResult::SUCCESSFUL) {
+    return err;
+  }
+  sockets.push_back(new_socket);
+  return SocketResult::SUCCESSFUL;
+}
+
 // Memory
-int saba_memory_allocate(uint32_t connection_fd, uint8_t **memory, uint32_t len) {
+int saba_memory_allocate(uint32_t connection_fd, uint8_t **memory,
+                         uint32_t len) {
 
   if (sockets.size() <= connection_fd) {
     return SocketResult::SOCKET_INVALID_FD;

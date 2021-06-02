@@ -32,7 +32,7 @@
 class SocketResult : public SabaResult {
 public:
   enum {
-    SOCKET_INVALID_FD,
+    SOCKET_INVALID_FD = 10,
     SOCKET_CREATE_FAILED,
     SOCKET_CONNECT_FAILED,
     SOCKET_SEND_FAILED,

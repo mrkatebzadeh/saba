@@ -123,6 +123,11 @@ void Scheduler::generate_sensitivity_table() {
 
 void Scheduler::cluster_applications() {
   int npoints = sensitivity_table.size();
+
+  if (npoints == 0) {
+    return;
+  }
+
   int opt_method = HCLUST_METHOD_SINGLE;
 
   double *distmat = new double[(npoints * (npoints - 1)) / 2];
@@ -157,6 +162,11 @@ void Scheduler::cluster_applications() {
 
 void Scheduler::cluster_SLs() {
   int npoints = available_SLs;
+
+  if (npoints == 0) {
+    return;
+  }
+
   int opt_method = HCLUST_METHOD_SINGLE;
 
   double *distmat = new double[(npoints * (npoints - 1)) / 2];

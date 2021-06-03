@@ -22,7 +22,7 @@
  * SOFTWARE.
  */
 
-#include "hirarchical_cluster.h"
+#include "hierarchical_cluster.h"
 
 #include <algorithm>
 #include <vector>

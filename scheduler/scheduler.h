@@ -23,19 +23,19 @@
 
 #ifndef SCHEDULER_H
 #define SCHEDULER_H
-#include "hirarchical_cluster.h"
+#include "hierarchical_cluster.h"
 #include <cstdint>
 #include <map>
 #include <vector>
 
-class TargetType {
-public:
-  enum { TARGET_HCA = 0, TARGET_SWITCH = 1 };
-};
+enum class TargetType { TARGET_HCA = 0, TARGET_SWITCH = 1 };
 
-class AllocationAlgorithm {
-public:
-  enum { IB, IDEALMAXMIN, BESTFITSMART, HIERARCHICALSMART, IDEALSMART };
+enum class AllocationAlgorithm {
+  IB,
+  IDEALMAXMIN,
+  BESTFITSMART,
+  HIERARCHICALSMART,
+  IDEALSMART
 };
 
 class ProfileRecord {
@@ -65,18 +65,23 @@ public:
   std::vector<BandwidthAllocationRecord> allocation_table;
 
   // tables
-  std::map<int, std::vector<double> > slowdown_table;
+  std::map<int, std::vector<double>> slowdown_table;
   std::map<int, double> sensitivity_table;
-  std::map<int, std::vector<int> > sl_to_app_table;
+  std::map<int, std::vector<int>> sl_to_app_table;
   std::vector<int> app_to_sl_table;
   std::vector<int> sl_to_vl_table;
 
   // methods
-  void load_profile_table(const char *profile_table_file);
+  void load_profile_table(std::string profile_table_file);
   void generate_slowdown_table();
   void generate_sensitivity_table();
   void cluster_applications();
   void cluster_SLs();
+  int calculate_SL_by_IB(std::string *c_msg);
+  int calculate_SL_by_idealmaxmin(std::string *c_msg);
+  int calculate_SL_by_bestfitsmart(std::string *c_msg);
+  int calculate_SL_by_hierarchicalsmart(std::string *c_msg);
+  int calculate_SL_by_idealsmart(std::string *c_msg);
 };
 
 #endif

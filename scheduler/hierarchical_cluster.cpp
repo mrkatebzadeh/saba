@@ -1,5 +1,5 @@
 /**
- * scheduler/hirarchical_cluster.cpp
+ * scheduler/hierarchical_cluster.cpp
  * Copyright (c) 2021 M.R. Siavash Katebzadeh <mr.katebzadeh@gmail.com>
  * Copyright (c) 2011  Daniel Müllner
  *

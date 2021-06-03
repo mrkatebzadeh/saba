@@ -33,6 +33,6 @@ if (NOT spdlog_POPULATED)
     add_subdirectory(${spdlog_SOURCE_DIR} ${spdlog_BINARY_DIR})
 endif()
 
-add_executable(scheduler scheduler.cpp)
+add_executable(scheduler scheduler.cpp hierarchical_cluster.cpp scheduler_args.cpp)
 
 target_link_libraries(scheduler spdlog::spdlog)

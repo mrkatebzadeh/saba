@@ -28,9 +28,13 @@
 #include <sstream>
 
 Scheduler scheduler;
+
 int main(int argc, char **argv) {
 
+  spdlog::info("Scheduler started.");
+
   auto config = parse_opt(argc, argv);
+
   scheduler.available_SLs = config.available_SLs;
   scheduler.available_VLs = config.available_VLs;
 
@@ -48,10 +52,19 @@ int main(int argc, char **argv) {
     scheduler.algorithm = AllocationAlgorithm::IB;
   }
 
+  spdlog::info("Loading profile table from {} ...", config.profile_table_file);
   scheduler.load_profile_table(config.profile_table_file);
+
+  spdlog::info("Generating slowdoan table...");
   scheduler.generate_slowdown_table();
+
+  spdlog::info("Generating sensitivity table...");
   scheduler.generate_sensitivity_table();
+
+  spdlog::info("Clustering applications...");
   scheduler.cluster_applications();
+
+  spdlog::info("Clustering SLs...");
   scheduler.cluster_SLs();
 
   return 0;

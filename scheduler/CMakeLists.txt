@@ -33,6 +33,20 @@ if (NOT spdlog_POPULATED)
     add_subdirectory(${spdlog_SOURCE_DIR} ${spdlog_BINARY_DIR})
 endif()
 
+FetchContent_Declare(
+        rpc
+        GIT_REPOSITORY https://github.com/rpclib/rpclib.git
+        GIT_TAG        v2.2.1
+)
+
+FetchContent_GetProperties(rpc)
+if (NOT rpc_POPULATED)
+    FetchContent_Populate(rpc)
+    add_subdirectory(${rpc_SOURCE_DIR} ${rpc_BINARY_DIR})
+endif()
+
+include_directories(${rpc_SOURCE_DIR}/include/)
+
 add_executable(scheduler scheduler.cpp hierarchical_cluster.cpp scheduler_args.cpp)
 
-target_link_libraries(scheduler spdlog::spdlog)
+target_link_libraries(scheduler rpc spdlog::spdlog)

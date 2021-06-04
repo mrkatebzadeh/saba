@@ -32,6 +32,7 @@
 class SchedulerConfig {
 public:
   bool verbose;
+  int port;
   int available_SLs;
   int available_VLs;
   std::string algorithm;

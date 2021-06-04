@@ -28,9 +28,40 @@
 #include <sstream>
 
 Scheduler scheduler;
+
+int get_SL(uint32_t connection_fd) {
+  int sl = 0;
+  switch (scheduler.algorithm) {
+  case AllocationAlgorithm::IB:
+    sl = scheduler.calculate_SL_by_IB(connection_fd);
+    break;
+  case AllocationAlgorithm::IDEALMAXMIN:
+    sl = scheduler.calculate_SL_by_idealmaxmin(connection_fd);
+    break;
+  case AllocationAlgorithm::IDEALSMART:
+    sl = scheduler.calculate_SL_by_idealsmart(connection_fd);
+    break;
+  case AllocationAlgorithm::BESTFITSMART:
+    sl = scheduler.calculate_SL_by_bestfitsmart(connection_fd);
+    break;
+  case AllocationAlgorithm::HIERARCHICALSMART:
+    sl = scheduler.calculate_SL_by_hierarchicalsmart(connection_fd);
+    break;
+  default:
+    break;
+  }
+  spdlog::info("Connection: {} got SL: {}", connection_fd, sl);
+  return sl;
+}
+
 int main(int argc, char **argv) {
 
+  spdlog::info("Scheduler started.");
+
   auto config = parse_opt(argc, argv);
+
+  rpc::server rpc_server(config.port);
+
   scheduler.available_SLs = config.available_SLs;
   scheduler.available_VLs = config.available_VLs;
 
@@ -48,27 +79,40 @@ int main(int argc, char **argv) {
     scheduler.algorithm = AllocationAlgorithm::IB;
   }
 
+  spdlog::info("Loading profile table from {} ...", config.profile_table_file);
   scheduler.load_profile_table(config.profile_table_file);
+
+  spdlog::info("Generating slowdoan table...");
   scheduler.generate_slowdown_table();
+
+  spdlog::info("Generating sensitivity table...");
   scheduler.generate_sensitivity_table();
+
+  spdlog::info("Clustering applications...");
   scheduler.cluster_applications();
+
+  spdlog::info("Clustering SLs...");
   scheduler.cluster_SLs();
 
+  spdlog::info("Serving ...");
+  rpc_server.bind("get_sl", &get_SL);
+
+  rpc_server.run();
   return 0;
 }
 
-void Scheduler::load_profile_table(std::string profile_table_file) {
-  std::ifstream myFile(profile_table_file);
+void Scheduler::load_profile_table(std::string profile_table_file_address) {
+  std::ifstream table_file(profile_table_file_address);
   std::string line, colname;
   double val;
 
-  if (myFile.good()) {
+  if (table_file.good()) {
     // Extract the first line in the file
-    std::getline(myFile, line);
+    std::getline(table_file, line);
   }
 
   // Read data, line by line
-  while (std::getline(myFile, line)) {
+  while (std::getline(table_file, line)) {
     // Create a stringstream of the current line
     ProfileRecord pr;
     std::stringstream ss(line);
@@ -90,7 +134,7 @@ void Scheduler::load_profile_table(std::string profile_table_file) {
     profile_table.push_back(pr);
   }
 
-  myFile.close();
+  table_file.close();
 }
 
 void Scheduler::generate_slowdown_table() {
@@ -110,6 +154,11 @@ void Scheduler::generate_sensitivity_table() {
 
 void Scheduler::cluster_applications() {
   int npoints = sensitivity_table.size();
+
+  if (npoints == 0) {
+    return;
+  }
+
   int opt_method = HCLUST_METHOD_SINGLE;
 
   double *distmat = new double[(npoints * (npoints - 1)) / 2];
@@ -144,6 +193,11 @@ void Scheduler::cluster_applications() {
 
 void Scheduler::cluster_SLs() {
   int npoints = available_SLs;
+
+  if (npoints == 0) {
+    return;
+  }
+
   int opt_method = HCLUST_METHOD_SINGLE;
 
   double *distmat = new double[(npoints * (npoints - 1)) / 2];
@@ -181,25 +235,25 @@ void Scheduler::cluster_SLs() {
   delete[] labels;
 }
 
-int Scheduler::calculate_SL_by_IB(std::string *c_msg) { return 1; }
+int Scheduler::calculate_SL_by_IB(uint32_t connection_fd) { return 1; }
 
-int Scheduler::calculate_SL_by_idealmaxmin(std::string *c_msg) {
-
-  return 0; // TODO
-}
-
-int Scheduler::calculate_SL_by_bestfitsmart(std::string *c_msg) {
+int Scheduler::calculate_SL_by_idealmaxmin(uint32_t connection_fd) {
 
   return 0; // TODO
 }
 
-int Scheduler::calculate_SL_by_hierarchicalsmart(std::string *c_msg) {
-  int srcLid = 0; // TODO c_msg->getSrcLid();
+int Scheduler::calculate_SL_by_bestfitsmart(uint32_t connection_fd) {
 
-  return app_to_sl_table[srcLid];
+  return 0; // TODO
 }
 
-int Scheduler::calculate_SL_by_idealsmart(std::string *c_msg) {
+int Scheduler::calculate_SL_by_hierarchicalsmart(uint32_t connection_fd) {
+  int app = conn_to_app_table[connection_fd]; // TODO c_msg->getSrcLid();
+
+  return app_to_sl_table[app];
+}
+
+int Scheduler::calculate_SL_by_idealsmart(uint32_t connection_fd) {
 
   return 0; // TODO
 }

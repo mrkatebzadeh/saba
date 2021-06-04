@@ -45,8 +45,12 @@ if (NOT rpc_POPULATED)
     add_subdirectory(${rpc_SOURCE_DIR} ${rpc_BINARY_DIR})
 endif()
 
+include_directories(${spdlog_SOURCE_DIR}/include/)
+
 include_directories(${rpc_SOURCE_DIR}/include/)
 
-add_executable(scheduler main.cpp rpc.cpp scheduler.cpp hierarchical_cluster.cpp scheduler_args.cpp)
+add_library(scheduler rpc.cpp scheduler.cpp hierarchical_cluster.cpp scheduler_args.cpp)
 
-target_link_libraries(scheduler rpc spdlog::spdlog)
+add_executable(saba_scheduler main.cpp)
+
+target_link_libraries(saba_scheduler scheduler rpc spdlog::spdlog)

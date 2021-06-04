@@ -29,28 +29,31 @@
 
 Scheduler scheduler;
 
-int get_SL(uint32_t connection_fd) {
+int app_register(std::string application_name) {
   int sl = 0;
+  auto application_fd = scheduler.name_to_app_table[application_name];
+
   switch (scheduler.algorithm) {
   case AllocationAlgorithm::IB:
-    sl = scheduler.calculate_SL_by_IB(connection_fd);
+    sl = scheduler.calculate_SL_by_IB(application_fd);
     break;
   case AllocationAlgorithm::IDEALMAXMIN:
-    sl = scheduler.calculate_SL_by_idealmaxmin(connection_fd);
+    sl = scheduler.calculate_SL_by_idealmaxmin(application_fd);
     break;
   case AllocationAlgorithm::IDEALSMART:
-    sl = scheduler.calculate_SL_by_idealsmart(connection_fd);
+    sl = scheduler.calculate_SL_by_idealsmart(application_fd);
     break;
   case AllocationAlgorithm::BESTFITSMART:
-    sl = scheduler.calculate_SL_by_bestfitsmart(connection_fd);
+    sl = scheduler.calculate_SL_by_bestfitsmart(application_fd);
     break;
   case AllocationAlgorithm::HIERARCHICALSMART:
-    sl = scheduler.calculate_SL_by_hierarchicalsmart(connection_fd);
+    sl = scheduler.calculate_SL_by_hierarchicalsmart(application_fd);
     break;
   default:
+    spdlog::error("Unknown allocation algorithm");
     break;
   }
-  spdlog::info("Connection: {} got SL: {}", connection_fd, sl);
+  spdlog::info("Application: {} got SL: {}", application_fd, sl);
   return sl;
 }
 
@@ -95,7 +98,7 @@ int main(int argc, char **argv) {
   scheduler.cluster_SLs();
 
   spdlog::info("Serving ...");
-  rpc_server.bind("get_sl", &get_SL);
+  rpc_server.bind("app_register", &app_register);
 
   rpc_server.run();
   return 0;
@@ -235,25 +238,23 @@ void Scheduler::cluster_SLs() {
   delete[] labels;
 }
 
-int Scheduler::calculate_SL_by_IB(uint32_t connection_fd) { return 1; }
+int Scheduler::calculate_SL_by_IB(uint32_t application_fd) { return 1; }
 
-int Scheduler::calculate_SL_by_idealmaxmin(uint32_t connection_fd) {
-
-  return 0; // TODO
-}
-
-int Scheduler::calculate_SL_by_bestfitsmart(uint32_t connection_fd) {
+int Scheduler::calculate_SL_by_idealmaxmin(uint32_t application_fd) {
 
   return 0; // TODO
 }
 
-int Scheduler::calculate_SL_by_hierarchicalsmart(uint32_t connection_fd) {
-  int app = conn_to_app_table[connection_fd]; // TODO c_msg->getSrcLid();
+int Scheduler::calculate_SL_by_bestfitsmart(uint32_t application_fd) {
 
-  return app_to_sl_table[app];
+  return 0; // TODO
 }
 
-int Scheduler::calculate_SL_by_idealsmart(uint32_t connection_fd) {
+int Scheduler::calculate_SL_by_hierarchicalsmart(uint32_t application_fd) {
+  return app_to_sl_table[application_fd];
+}
+
+int Scheduler::calculate_SL_by_idealsmart(uint32_t application_fd) {
 
   return 0; // TODO
 }

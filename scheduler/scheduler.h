@@ -17,7 +17,7 @@
  * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
  * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
  * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
- * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * OUT OF OR IN application WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
 
@@ -70,6 +70,7 @@ public:
   std::map<int, std::vector<double>> slowdown_table;
   std::map<int, double> sensitivity_table;
   std::map<int, std::vector<int>> sl_to_app_table;
+  std::map<std::string, int> name_to_app_table;
   std::vector<int> conn_to_app_table;
   std::vector<int> app_to_sl_table;
   std::vector<int> sl_to_vl_table;
@@ -80,13 +81,13 @@ public:
   void generate_sensitivity_table();
   void cluster_applications();
   void cluster_SLs();
-  int calculate_SL_by_IB(uint32_t connection_fd);
-  int calculate_SL_by_idealmaxmin(uint32_t connection_fd);
-  int calculate_SL_by_bestfitsmart(uint32_t connection_fd);
-  int calculate_SL_by_hierarchicalsmart(uint32_t connection_fd);
-  int calculate_SL_by_idealsmart(uint32_t connection_fd);
+  int calculate_SL_by_IB(uint32_t application_fd);
+  int calculate_SL_by_idealmaxmin(uint32_t application_fd);
+  int calculate_SL_by_bestfitsmart(uint32_t application_fd);
+  int calculate_SL_by_hierarchicalsmart(uint32_t application_fd);
+  int calculate_SL_by_idealsmart(uint32_t application_fd);
 };
 
-int get_SL(uint32_t connection_fd);
+int app_register(std::string application_name);
 
 #endif

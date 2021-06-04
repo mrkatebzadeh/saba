@@ -24,6 +24,7 @@
 #ifndef SCHEDULER_H
 #define SCHEDULER_H
 #include "hierarchical_cluster.h"
+#include <spdlog/spdlog.h>
 #include <cstdint>
 #include <map>
 #include <vector>

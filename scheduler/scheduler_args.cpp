@@ -31,12 +31,13 @@ SchedulerConfig parse_opt(int argc, char **argv) {
 
         {"verbose", no_argument, 0, 'v'},
         {"algorithm", required_argument, 0, 'a'},
+        {"table", required_argument, 0, 't'},
         {"vls", required_argument, 0, 'V'},
         {"sls", required_argument, 0, 'S'}};
 
     int option_index = 0;
 
-    c = getopt_long(argc, argv, "va:V:S:", long_options, &option_index);
+    c = getopt_long(argc, argv, "va:t:V:S:", long_options, &option_index);
 
     if (c == -1)
       break;
@@ -57,6 +58,10 @@ SchedulerConfig parse_opt(int argc, char **argv) {
 
     case 'a':
       config.algorithm = std::string(optarg);
+      break;
+
+    case 't':
+      config.profile_table_file = std::string(optarg);
       break;
 
     case 'V':

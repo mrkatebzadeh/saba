@@ -25,6 +25,7 @@
 #define SCHEDULER_H
 #include "hierarchical_cluster.h"
 #include <spdlog/spdlog.h>
+#include <rpc/server.h>
 #include <cstdint>
 #include <map>
 #include <vector>
@@ -69,6 +70,7 @@ public:
   std::map<int, std::vector<double>> slowdown_table;
   std::map<int, double> sensitivity_table;
   std::map<int, std::vector<int>> sl_to_app_table;
+  std::vector<int> conn_to_app_table;
   std::vector<int> app_to_sl_table;
   std::vector<int> sl_to_vl_table;
 
@@ -78,11 +80,13 @@ public:
   void generate_sensitivity_table();
   void cluster_applications();
   void cluster_SLs();
-  int calculate_SL_by_IB(std::string *c_msg);
-  int calculate_SL_by_idealmaxmin(std::string *c_msg);
-  int calculate_SL_by_bestfitsmart(std::string *c_msg);
-  int calculate_SL_by_hierarchicalsmart(std::string *c_msg);
-  int calculate_SL_by_idealsmart(std::string *c_msg);
+  int calculate_SL_by_IB(uint32_t connection_fd);
+  int calculate_SL_by_idealmaxmin(uint32_t connection_fd);
+  int calculate_SL_by_bestfitsmart(uint32_t connection_fd);
+  int calculate_SL_by_hierarchicalsmart(uint32_t connection_fd);
+  int calculate_SL_by_idealsmart(uint32_t connection_fd);
 };
+
+int get_SL(uint32_t connection_fd);
 
 #endif

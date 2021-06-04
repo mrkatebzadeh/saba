@@ -22,14 +22,23 @@
  */
 
 #include "scheduler_args.h"
+#include "scheduler.h"
 
 SchedulerConfig parse_opt(int argc, char **argv) {
   int c;
   auto config = SchedulerConfig();
+  config.algorithm = std::string("hierarchicalsmart");
+  config.port = 8585;
+  config.verbose = true;
+  config.available_SLs = IBMAXSLVL;
+  config.available_VLs = IBMAXSLVL;
+  config.profile_table_file = std::string("./profile_table.csv");
+
   while (1) {
     static struct option long_options[] = {
 
         {"verbose", no_argument, 0, 'v'},
+        {"port", required_argument, 0, 'p'},
         {"algorithm", required_argument, 0, 'a'},
         {"table", required_argument, 0, 't'},
         {"vls", required_argument, 0, 'V'},
@@ -37,7 +46,7 @@ SchedulerConfig parse_opt(int argc, char **argv) {
 
     int option_index = 0;
 
-    c = getopt_long(argc, argv, "va:t:V:S:", long_options, &option_index);
+    c = getopt_long(argc, argv, "vp:a:t:V:S:", long_options, &option_index);
 
     if (c == -1)
       break;
@@ -54,6 +63,10 @@ SchedulerConfig parse_opt(int argc, char **argv) {
 
     case 'v':
       config.verbose = true;
+      break;
+
+    case 'p':
+      config.port = atoi(optarg);
       break;
 
     case 'a':

@@ -17,17 +17,17 @@
  * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
  * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
  * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
- * OUT OF OR IN application WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
- * SOFTWARE.
+ * OUT OF OR IN application WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+ * THE SOFTWARE.
  */
 
 #ifndef SCHEDULER_H
 #define SCHEDULER_H
 #include "hierarchical_cluster.h"
-#include <spdlog/spdlog.h>
-#include <rpc/server.h>
 #include <cstdint>
 #include <map>
+#include <rpc/server.h>
+#include <spdlog/spdlog.h>
 #include <vector>
 
 enum class TargetType { TARGET_HCA = 0, TARGET_SWITCH = 1 };
@@ -88,6 +88,6 @@ public:
   int calculate_SL_by_idealsmart(uint32_t application_fd);
 };
 
-int app_register(std::string application_name);
+int app_register_handler(Scheduler *scheduler, std::string application_name);
 
 #endif

@@ -47,6 +47,6 @@ endif()
 
 include_directories(${rpc_SOURCE_DIR}/include/)
 
-add_executable(scheduler scheduler.cpp hierarchical_cluster.cpp scheduler_args.cpp)
+add_executable(scheduler main.cpp rpc.cpp scheduler.cpp hierarchical_cluster.cpp scheduler_args.cpp)
 
 target_link_libraries(scheduler rpc spdlog::spdlog)

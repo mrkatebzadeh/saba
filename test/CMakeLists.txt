@@ -28,6 +28,35 @@ FetchContent_Declare(
 )
 FetchContent_MakeAvailable(googletest)
 
+FetchContent_Declare(
+        rpc
+        GIT_REPOSITORY https://github.com/rpclib/rpclib.git
+        GIT_TAG        v2.2.1
+)
+
+FetchContent_GetProperties(rpc)
+if (NOT rpc_POPULATED)
+    FetchContent_Populate(rpc)
+    add_subdirectory(${rpc_SOURCE_DIR} ${rpc_BINARY_DIR})
+endif()
+
+include_directories(${rpc_SOURCE_DIR}/include/)
+
+
+FetchContent_Declare(
+        spdlog
+        GIT_REPOSITORY https://github.com/gabime/spdlog.git
+        GIT_TAG        v1.x
+)
+
+FetchContent_GetProperties(spdlog)
+if (NOT spdlog_POPULATED)
+    FetchContent_Populate(spdlog)
+    add_subdirectory(${spdlog_SOURCE_DIR} ${spdlog_BINARY_DIR})
+endif()
+
+include_directories(${spdlog_SOURCE_DIR}/include/)
+
 enable_testing()
 
 
@@ -44,8 +73,22 @@ target_link_libraries(
   gtest_main
 )
 
+add_executable(
+  scheduler_test
+  scheduler_test.cpp
+)
+
+target_include_directories(scheduler_test PUBLIC ../include)
+
+target_link_libraries(
+  scheduler_test
+  scheduler
+  gtest_main
+)
+
 include(GoogleTest)
 gtest_discover_tests(socket_test)
+gtest_discover_tests(scheduler_test)
 
 source_group(
   TREE "${PROJECT_SOURCE_DIR}/include"

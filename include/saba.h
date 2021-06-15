@@ -44,6 +44,45 @@ public:
   }
 };
 
+class SocketResult : public SabaResult {
+public:
+  enum {
+    SOCKET_INVALID_FD = 10,
+    SOCKET_CREATE_FAILED,
+    SOCKET_BIND_FAILED,
+    SOCKET_LISTEN_FAILED,
+    SOCKET_ACCEPT_FAILED,
+    SOCKET_CONNECT_FAILED,
+    SOCKET_SEND_FAILED,
+    SOCKET_RECV_FAILED,
+    SOCKET_ALLOC_FAILED
+  };
+  static const char *getstring(int err) {
+    switch (err) {
+    case SOCKET_INVALID_FD:
+      return "Socket invalid fd";
+    case SOCKET_CREATE_FAILED:
+      return "Socket create failed";
+    case SOCKET_BIND_FAILED:
+      return "Socket bind failed";
+    case SOCKET_LISTEN_FAILED:
+      return "Socket listen failed";
+    case SOCKET_ACCEPT_FAILED:
+      return "Socket accept failed";
+    case SOCKET_CONNECT_FAILED:
+      return "Socket connect failed";
+    case SOCKET_SEND_FAILED:
+      return "Socket send failed";
+    case SOCKET_RECV_FAILED:
+      return "Socket recv failed";
+    case SOCKET_ALLOC_FAILED:
+      return "Socket alloc failed";
+    default:
+      return SabaResult::getstring(err);
+    }
+  }
+};
+
 // Application
 int saba_app_register(const char *application_name, uint32_t *application_fd);
 int saba_app_deregister(uint32_t *application_fd);

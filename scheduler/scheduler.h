@@ -57,6 +57,21 @@ public:
   std::uint32_t bw;
 };
 
+class Connection {
+public:
+  std::string src;
+  std::string dst;
+  std::string application;
+};
+
+class IBSwitch {
+public:
+  int id;
+  std::string high_config;
+  std::string low_config;
+  std::map<int, Connection> connections;
+};
+
 class Scheduler {
 public:
   // parameters:
@@ -74,6 +89,8 @@ public:
   std::vector<int> conn_to_app_table;
   std::vector<int> app_to_sl_table;
   std::vector<int> sl_to_vl_table;
+  std::map<int, Connection> connections;
+  std::map<int, IBSwitch> switch_configs;
 
   // methods
   void load_profile_table(std::string profile_table_file);
@@ -86,8 +103,13 @@ public:
   int calculate_SL_by_bestfitsmart(uint32_t application_fd);
   int calculate_SL_by_hierarchicalsmart(uint32_t application_fd);
   int calculate_SL_by_idealsmart(uint32_t application_fd);
+  void config_all_switches();
+  std::vector<IBSwitch> get_path_switches(Connection connection);
 };
 
 int app_register_handler(Scheduler *scheduler, std::string application_name);
+int connection_create_handler(Scheduler *scheduler, std::string src,
+                              std::string dst, std::string application);
+void connection_destroy_handler(Scheduler *scheduler, int connection_fd);
 
 #endif

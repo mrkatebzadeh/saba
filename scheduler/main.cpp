@@ -73,6 +73,15 @@ int main(int argc, char **argv) {
     return app_register_handler(&scheduler, application_name);
   });
 
+  rpc_server.bind("connection_create", [](std::string src, std::string dst,
+                                          std::string application_name) {
+    return connection_create_handler(&scheduler, src, dst, application_name);
+  });
+
+  rpc_server.bind("connection_destroy", [](int connection_fd) {
+    connection_destroy_handler(&scheduler, connection_fd);
+  });
+
   rpc_server.run();
   return 0;
 }

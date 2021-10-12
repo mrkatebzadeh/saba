@@ -32,6 +32,6 @@
 *.app
 
 # Temp files
-build/
-.cache/
-Testing/
+build/*
+.cache/*
+Testing/*

@@ -1,0 +1,16 @@
+# TOTO
+## Scheduler
+- [x] Load profile table
+- [x] Generate slowdown table
+- [x] Generate sensitivity table
+- [x] Cluster applications
+- [x] Cluster SLs
+- [x] App register
+- [ ] Connection create
+
+## Applications
+
+## Plots
+- [ ] Bandwidth over time
+
+## Experiments

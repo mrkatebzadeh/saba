@@ -56,6 +56,9 @@ void Controller::loadProfileTable(std::string profile_table_file_address) {
     if (ss.peek() == ',') ss.ignore();
     ss >> val;
     pr.slowdown = val;
+
+    spdlog::debug("loadProfileTable: Adding {}", pr);
+
     profile_table.push_back(pr);
   }
 

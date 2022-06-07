@@ -50,23 +50,44 @@ class ProfileRecord {
   std::uint32_t bw;
   double time;
   double slowdown;
+  friend std::ostream& operator<<(std::ostream& os, const ProfileRecord& obj);
 };
+
+std::ostream& operator<<(std::ostream& os, const ProfileRecord& obj) {
+  os << obj.app << ',' << obj.bw << ',' << obj.slowdown << ',' << obj.time;
+  return os;
+}
 
 class BandwidthAllocationRecord {
  public:
   std::uint32_t app;
   std::uint32_t src;
   std::uint32_t dst;
-  std::uint32_t sl;
+  std::uint32_t pl;
   std::uint32_t bw;
+  friend std::ostream& operator<<(std::ostream& os,
+                                  const BandwidthAllocationRecord& obj);
 };
+
+std::ostream& operator<<(std::ostream& os,
+                         const BandwidthAllocationRecord& obj) {
+  os << obj.app << ',' << obj.bw << ',' << obj.src << ',' << obj.dst << ','
+     << obj.pl;
+  return os;
+}
 
 class Connection {
  public:
   std::string src;
   std::string dst;
   std::string application;
+  friend std::ostream& operator<<(std::ostream& os, const Connection& obj);
 };
+
+std::ostream& operator<<(std::ostream& os, const Connection& obj) {
+  os << obj.src << ',' << obj.dst << ',' << obj.application;
+  return os;
+}
 
 class IBSwitch {
  public:
@@ -74,7 +95,17 @@ class IBSwitch {
   std::string high_config;
   std::string low_config;
   std::map<int, Connection> connections;
+  friend std::ostream& operator<<(std::ostream& os, const IBSwitch& obj);
 };
+
+std::ostream& operator<<(std::ostream& os, const IBSwitch& obj) {
+  os << obj.id << ',' << obj.high_config << ',' << obj.low_config << '[';
+  for (const auto& keyvalue : obj.connections) {
+    os << keyvalue.second << ',';
+  }
+  os << ']';
+  return os;
+}
 
 class Controller {
  public:
@@ -111,9 +142,9 @@ class Controller {
   std::vector<IBSwitch> getPathSwitches(Connection connection);
 };
 
-int appRegisterHandler(Controller *controller, std::string application_name);
-int connectionCreateHandler(Controller *controller, std::string src,
+int appRegisterHandler(Controller* controller, std::string application_name);
+int connectionCreateHandler(Controller* controller, std::string src,
                             std::string dst, std::string application);
-void connectionDestroyHandler(Controller *controller, int connection_fd);
+void connectionDestroyHandler(Controller* controller, int connection_fd);
 
 #endif

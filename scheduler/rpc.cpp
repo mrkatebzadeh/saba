@@ -51,3 +51,10 @@ int app_register_handler(Scheduler* scheduler, std::string application_name) {
   return sl;
 }
 
+int connection_create_handler(Scheduler *scheduler, std::string src,
+                              std::string dst, std::string application) {
+                                //TODO
+                              }
+void connection_destroy_handler(Scheduler *scheduler, int connection_fd) {
+  //TODO
+}

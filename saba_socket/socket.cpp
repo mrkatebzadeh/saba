@@ -21,16 +21,18 @@
  * SOFTWARE.
  */
 
-#include "saba.h"
 #include <arpa/inet.h>
+#include <sys/socket.h>
+
 #include <cstdint>
 #include <cstdio>
 #include <cstdlib>
-#include <sys/socket.h>
 #include <vector>
 
+#include "saba.h"
+
 class SocketConnection {
-public:
+ public:
   int socket_desc;
   struct sockaddr_in destination;
   std::uint32_t memory_size;
@@ -103,13 +105,12 @@ public:
 static std::vector<SocketConnection *> sockets;
 // Application
 int saba_app_register(const char *application_name, uint32_t *application_fd) {
-  *application_fd = 1; // TODO
+  *application_fd = 1;  // TODO
   return SocketResult::SUCCESSFUL;
 }
 
 int saba_app_deregister(uint32_t *application_fd) {
-
-  *application_fd = 0; // TODO
+  *application_fd = 0;  // TODO
   return SocketResult::SUCCESSFUL;
 }
 
@@ -157,7 +158,6 @@ int saba_connection_create_server(uint32_t *connection_fd,
 // Memory
 int saba_memory_allocate(uint32_t connection_fd, uint8_t **memory,
                          uint32_t len) {
-
   if (sockets.size() <= connection_fd) {
     return SocketResult::SOCKET_INVALID_FD;
   }
@@ -169,7 +169,6 @@ int saba_memory_allocate(uint32_t connection_fd, uint8_t **memory,
 }
 
 int saba_memory_free(uint32_t connection_fd, uint8_t **memory, uint32_t len) {
-
   if (sockets.size() <= connection_fd) {
     return SocketResult::SOCKET_INVALID_FD;
   }
@@ -179,7 +178,6 @@ int saba_memory_free(uint32_t connection_fd, uint8_t **memory, uint32_t len) {
 
 // Exchange data
 int saba_write(uint32_t connection_fd, uint8_t *memory, uint32_t len) {
-
   if (sockets.size() <= connection_fd) {
     return SocketResult::SOCKET_INVALID_FD;
   }

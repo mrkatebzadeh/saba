@@ -21,8 +21,9 @@
  * SOFTWARE.
  */
 
-#include "args.h"
 #include <iostream>
+
+#include "args.h"
 
 int main(int argc, char **argv) {
   auto config = parse_opt(argc, argv);

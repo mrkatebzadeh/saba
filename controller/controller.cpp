@@ -22,12 +22,14 @@
  */
 
 #include "controller.h"
-#include "controller_args.h"
+
 #include <fstream>
 #include <numeric>
 #include <sstream>
 
-void Controller::load_profile_table(std::string profile_table_file_address) {
+#include "controller_args.h"
+
+void Controller::loadProfileTable(std::string profile_table_file_address) {
   std::ifstream table_file(profile_table_file_address);
   std::string line, colname;
   double val;
@@ -45,16 +47,13 @@ void Controller::load_profile_table(std::string profile_table_file_address) {
 
     ss >> val;
     pr.app = (int)val;
-    if (ss.peek() == ',')
-      ss.ignore();
+    if (ss.peek() == ',') ss.ignore();
     ss >> val;
     pr.bw = (int)val;
-    if (ss.peek() == ',')
-      ss.ignore();
+    if (ss.peek() == ',') ss.ignore();
     ss >> val;
     pr.time = val;
-    if (ss.peek() == ',')
-      ss.ignore();
+    if (ss.peek() == ',') ss.ignore();
     ss >> val;
     pr.slowdown = val;
     profile_table.push_back(pr);
@@ -63,13 +62,13 @@ void Controller::load_profile_table(std::string profile_table_file_address) {
   table_file.close();
 }
 
-void Controller::generate_slowdown_table() {
+void Controller::generateSlowdownTable() {
   for (auto record : profile_table) {
     slowdown_table[record.app].push_back(record.slowdown);
   }
 }
 
-void Controller::generate_sensitivity_table() {
+void Controller::generateSensitivityTable() {
   // For now, just simple average. //TODO weighted average
   for (auto app : slowdown_table) {
     sensitivity_table[app.first] =
@@ -78,7 +77,7 @@ void Controller::generate_sensitivity_table() {
   }
 }
 
-void Controller::cluster_applications() {
+void Controller::clusterApplications() {
   int npoints = sensitivity_table.size();
 
   if (npoints == 0) {
@@ -103,11 +102,11 @@ void Controller::cluster_applications() {
   hclust_fast(npoints, distmat, opt_method, merge, height);
 
   int *labels = new int[npoints];
-  cutree_k(npoints, merge, available_SLs, labels);
+  cutree_k(npoints, merge, available_pls, labels);
 
   for (int i = 0; i < npoints; i++) {
-    sl_to_app_table[labels[i]].push_back(i);
-    app_to_sl_table.push_back(labels[i]);
+    pl_to_app_table[labels[i]].push_back(i);
+    app_to_pl_table.push_back(labels[i]);
   }
 
   // clean up
@@ -117,8 +116,8 @@ void Controller::cluster_applications() {
   delete[] labels;
 }
 
-void Controller::cluster_SLs() {
-  int npoints = available_SLs;
+void Controller::clusterPriorityLevels() {
+  int npoints = available_pls;
 
   if (npoints == 0) {
     return;
@@ -130,13 +129,13 @@ void Controller::cluster_SLs() {
   int k = 0;
 
   for (int i = 0; i < npoints; i++) {
-    double sl1 = std::accumulate(sl_to_app_table[i].begin(),
-                                 sl_to_app_table[i].end(), 0.0) /
-                 sl_to_app_table[i].size();
+    double sl1 = std::accumulate(pl_to_app_table[i].begin(),
+                                 pl_to_app_table[i].end(), 0.0) /
+                 pl_to_app_table[i].size();
     for (int j = i + 1; j < npoints; j++) {
-      double sl2 = std::accumulate(sl_to_app_table[j].begin(),
-                                   sl_to_app_table[j].end(), 0.0) /
-                   sl_to_app_table[j].size();
+      double sl2 = std::accumulate(pl_to_app_table[j].begin(),
+                                   pl_to_app_table[j].end(), 0.0) /
+                   pl_to_app_table[j].size();
       distmat[k] = std::fabs(sl1 - sl2);
       k++;
     }
@@ -148,10 +147,10 @@ void Controller::cluster_SLs() {
   hclust_fast(npoints, distmat, opt_method, merge, height);
 
   int *labels = new int[npoints];
-  cutree_k(npoints, merge, available_VLs, labels);
+  cutree_k(npoints, merge, available_qs, labels);
 
   for (int i = 0; i < npoints; i++) {
-    sl_to_vl_table.push_back(labels[i]);
+    pl_to_q_table.push_back(labels[i]);
   }
 
   // clean up
@@ -161,23 +160,23 @@ void Controller::cluster_SLs() {
   delete[] labels;
 }
 
-int Controller::calculate_SL_by_IB(uint32_t application_fd) { return 1; }
-
-int Controller::calculate_SL_by_idealmaxmin(uint32_t application_fd) {
-
-  return 0; // TODO
+int Controller::calculatePriorityLevelsByMaxMin(uint32_t application_fd) {
+  return 1;
 }
 
-int Controller::calculate_SL_by_bestfitsmart(uint32_t application_fd) {
-
-  return 0; // TODO
+int Controller::calculatePriorityLevelsByIdealMaxMin(uint32_t application_fd) {
+  return 0;  // TODO
 }
 
-int Controller::calculate_SL_by_hierarchicalsmart(uint32_t application_fd) {
-  return app_to_sl_table[application_fd];
+int Controller::calculatePriorityLevelsByBestFitSmart(uint32_t application_fd) {
+  return 0;  // TODO
 }
 
-int Controller::calculate_SL_by_idealsmart(uint32_t application_fd) {
+int Controller::calculatePriorityLevelsByHierarchicalSmart(
+    uint32_t application_fd) {
+  return app_to_pl_table[application_fd];
+}
 
-  return 0; // TODO
+int Controller::calculatePriorityLevelsByIdealSmart(uint32_t application_fd) {
+  return 0;  // TODO
 }

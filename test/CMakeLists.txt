@@ -57,6 +57,21 @@ endif()
 
 include_directories(${spdlog_SOURCE_DIR}/include/)
 
+
+FetchContent_Declare(
+        nlopt
+        GIT_REPOSITORY https://github.com/stevengj/nlopt/
+        GIT_TAG        v2.7.1
+)
+
+FetchContent_GetProperties(nlopt)
+if (NOT nlopt_POPULATED)
+    FetchContent_Populate(nlopt)
+    add_subdirectory(${nlopt_SOURCE_DIR} ${nlopt_BINARY_DIR})
+endif()
+
+include_directories(${nlopt_SOURCE_DIR}/src/api/)
+
 enable_testing()
 
 

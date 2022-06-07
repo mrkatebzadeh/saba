@@ -22,23 +22,19 @@
  */
 
 #include "../controller/controller.h"
+
 #include <gtest/gtest.h>
 
 class ControllerTest : public ::testing::Test {
-protected:
+ protected:
   std::uint32_t app_fd;
   std::uint32_t conn_fd;
 };
 
-TEST_F(ControllerTest, AppRegister) {
-}
+TEST_F(ControllerTest, AppRegister) {}
 
-TEST_F(ControllerTest, ConnectionCreate) {
-}
+TEST_F(ControllerTest, ConnectionCreate) {}
 
-TEST_F(ControllerTest, ConnectionDestroy) {
-}
+TEST_F(ControllerTest, ConnectionDestroy) {}
 
-TEST_F(ControllerTest, AppDeregister) {
-}
-
+TEST_F(ControllerTest, AppDeregister) {}

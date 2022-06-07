@@ -20,24 +20,24 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-#include "controller.h"
-#include "controller_args.h"
 #include <fstream>
 #include <numeric>
 #include <sstream>
 
+#include "controller.h"
+#include "controller_args.h"
+
 Controller controller;
 
 int main(int argc, char **argv) {
-
   spdlog::info("Controller started.");
 
-  auto config = parse_opt(argc, argv);
+  auto config = parseOpts(argc, argv);
 
   rpc::server rpc_server(config.port);
 
-  controller.available_SLs = config.available_SLs;
-  controller.available_VLs = config.available_VLs;
+  controller.available_pls = config.available_pls;
+  controller.available_qs = config.available_qs;
 
   if (config.algorithm == "ib") {
     controller.algorithm = AllocationAlgorithm::IB;
@@ -54,32 +54,32 @@ int main(int argc, char **argv) {
   }
 
   spdlog::info("Loading profile table from {} ...", config.profile_table_file);
-  controller.load_profile_table(config.profile_table_file);
+  controller.loadProfileTable(config.profile_table_file);
 
   spdlog::info("Generating slowdoan table...");
-  controller.generate_slowdown_table();
+  controller.generateSlowdownTable();
 
   spdlog::info("Generating sensitivity table...");
-  controller.generate_sensitivity_table();
+  controller.generateSensitivityTable();
 
   spdlog::info("Clustering applications...");
-  controller.cluster_applications();
+  controller.clusterApplications();
 
   spdlog::info("Clustering SLs...");
-  controller.cluster_SLs();
+  controller.clusterPriorityLevels();
 
   spdlog::info("Serving ...");
   rpc_server.bind("app_register", [](std::string application_name) {
-    return app_register_handler(&controller, application_name);
+    return appRegisterHandler(&controller, application_name);
   });
 
   rpc_server.bind("connection_create", [](std::string src, std::string dst,
                                           std::string application_name) {
-    return connection_create_handler(&controller, src, dst, application_name);
+    return connectionCreateHandler(&controller, src, dst, application_name);
   });
 
   rpc_server.bind("connection_destroy", [](int connection_fd) {
-    connection_destroy_handler(&controller, connection_fd);
+    connectionDestroyHandler(&controller, connection_fd);
   });
 
   rpc_server.run();

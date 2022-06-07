@@ -22,16 +22,17 @@
  */
 
 #include "controller_args.h"
+
 #include "controller.h"
 
-ControllerConfig parse_opt(int argc, char **argv) {
+ControllerConfig parseOpts(int argc, char **argv) {
   int c;
   auto config = ControllerConfig();
   config.algorithm = std::string("hierarchicalsmart");
   config.port = 8585;
   config.verbose = true;
-  config.available_SLs = IBMAXSLVL;
-  config.available_VLs = IBMAXSLVL;
+  config.available_pls = IBMAXSLVL;
+  config.available_qs = IBMAXSLVL;
   config.profile_table_file = std::string("./profile_table.csv");
 
   while (1) {
@@ -48,45 +49,42 @@ ControllerConfig parse_opt(int argc, char **argv) {
 
     c = getopt_long(argc, argv, "vp:a:t:V:S:", long_options, &option_index);
 
-    if (c == -1)
-      break;
+    if (c == -1) break;
 
     switch (c) {
-    case 0:
-      if (long_options[option_index].flag != 0)
+      case 0:
+        if (long_options[option_index].flag != 0) break;
+        std::printf("option %s", long_options[option_index].name);
+        if (optarg) std::printf(" with arg %s", optarg);
+        std::printf("\n");
         break;
-      std::printf("option %s", long_options[option_index].name);
-      if (optarg)
-        std::printf(" with arg %s", optarg);
-      std::printf("\n");
-      break;
 
-    case 'v':
-      config.verbose = true;
-      break;
+      case 'v':
+        config.verbose = true;
+        break;
 
-    case 'p':
-      config.port = atoi(optarg);
-      break;
+      case 'p':
+        config.port = atoi(optarg);
+        break;
 
-    case 'a':
-      config.algorithm = std::string(optarg);
-      break;
+      case 'a':
+        config.algorithm = std::string(optarg);
+        break;
 
-    case 't':
-      config.profile_table_file = std::string(optarg);
-      break;
+      case 't':
+        config.profile_table_file = std::string(optarg);
+        break;
 
-    case 'V':
-      config.available_VLs = atoi(optarg);
-      break;
+      case 'V':
+        config.available_qs = atoi(optarg);
+        break;
 
-    case 'S':
-      config.available_SLs = atoi(optarg);
-      break;
+      case 'S':
+        config.available_pls = atoi(optarg);
+        break;
 
-    default:
-      printf("%c\n", c);
+      default:
+        printf("%c\n", c);
     }
   }
 

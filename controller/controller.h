@@ -23,12 +23,16 @@
 
 #ifndef CONTROLLER_H
 #define CONTROLLER_H
-#include "hierarchical_cluster.h"
-#include <cstdint>
-#include <map>
+#include <math.h>
+#include <nlopt.h>
 #include <rpc/server.h>
 #include <spdlog/spdlog.h>
+
+#include <cstdint>
+#include <map>
 #include <vector>
+
+#include "hierarchical_cluster.h"
 
 enum class TargetType { TARGET_HCA = 0, TARGET_SWITCH = 1 };
 
@@ -41,7 +45,7 @@ enum class AllocationAlgorithm {
 };
 
 class ProfileRecord {
-public:
+ public:
   std::uint32_t app;
   std::uint32_t bw;
   double time;
@@ -49,7 +53,7 @@ public:
 };
 
 class BandwidthAllocationRecord {
-public:
+ public:
   std::uint32_t app;
   std::uint32_t src;
   std::uint32_t dst;
@@ -58,14 +62,14 @@ public:
 };
 
 class Connection {
-public:
+ public:
   std::string src;
   std::string dst;
   std::string application;
 };
 
 class IBSwitch {
-public:
+ public:
   int id;
   std::string high_config;
   std::string low_config;
@@ -73,43 +77,43 @@ public:
 };
 
 class Controller {
-public:
+ public:
   // parameters:
   AllocationAlgorithm algorithm;
-  int available_SLs;
-  int available_VLs;
+  int available_pls;
+  int available_qs;
   std::vector<ProfileRecord> profile_table;
   std::vector<BandwidthAllocationRecord> allocation_table;
 
   // tables
   std::map<int, std::vector<double>> slowdown_table;
   std::map<int, double> sensitivity_table;
-  std::map<int, std::vector<int>> sl_to_app_table;
+  std::map<int, std::vector<int>> pl_to_app_table;
   std::map<std::string, int> name_to_app_table;
   std::vector<int> conn_to_app_table;
-  std::vector<int> app_to_sl_table;
-  std::vector<int> sl_to_vl_table;
+  std::vector<int> app_to_pl_table;
+  std::vector<int> pl_to_q_table;
   std::map<int, Connection> connections;
   std::map<int, IBSwitch> switch_configs;
 
   // methods
-  void load_profile_table(std::string profile_table_file);
-  void generate_slowdown_table();
-  void generate_sensitivity_table();
-  void cluster_applications();
-  void cluster_SLs();
-  int calculate_SL_by_IB(uint32_t application_fd);
-  int calculate_SL_by_idealmaxmin(uint32_t application_fd);
-  int calculate_SL_by_bestfitsmart(uint32_t application_fd);
-  int calculate_SL_by_hierarchicalsmart(uint32_t application_fd);
-  int calculate_SL_by_idealsmart(uint32_t application_fd);
-  void config_all_switches();
-  std::vector<IBSwitch> get_path_switches(Connection connection);
+  void loadProfileTable(std::string profile_table_file);
+  void generateSlowdownTable();
+  void generateSensitivityTable();
+  void clusterApplications();
+  void clusterPriorityLevels();
+  int calculatePriorityLevelsByMaxMin(uint32_t application_fd);
+  int calculatePriorityLevelsByIdealMaxMin(uint32_t application_fd);
+  int calculatePriorityLevelsByBestFitSmart(uint32_t application_fd);
+  int calculatePriorityLevelsByHierarchicalSmart(uint32_t application_fd);
+  int calculatePriorityLevelsByIdealSmart(uint32_t application_fd);
+  void configAllSwitches();
+  std::vector<IBSwitch> getPathSwitches(Connection connection);
 };
 
-int app_register_handler(Controller *controller, std::string application_name);
-int connection_create_handler(Controller *controller, std::string src,
-                              std::string dst, std::string application);
-void connection_destroy_handler(Controller *controller, int connection_fd);
+int appRegisterHandler(Controller *controller, std::string application_name);
+int connectionCreateHandler(Controller *controller, std::string src,
+                            std::string dst, std::string application);
+void connectionDestroyHandler(Controller *controller, int connection_fd);
 
 #endif

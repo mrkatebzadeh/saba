@@ -21,11 +21,12 @@
  * SOFTWARE.
  */
 
-#include "saba.h"
 #include <gtest/gtest.h>
 
+#include "saba.h"
+
 class SocketTest : public ::testing::Test {
-protected:
+ protected:
   std::uint32_t app_fd;
   std::uint32_t conn_fd;
 };

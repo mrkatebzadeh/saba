@@ -38,37 +38,34 @@ Config parse_opt(int argc, char **argv) {
 
     c = getopt_long(argc, argv, "vd:n:c:", long_options, &option_index);
 
-    if (c == -1)
-      break;
+    if (c == -1) break;
 
     switch (c) {
-    case 0:
-      if (long_options[option_index].flag != 0)
+      case 0:
+        if (long_options[option_index].flag != 0) break;
+        std::printf("option %s", long_options[option_index].name);
+        if (optarg) std::printf(" with arg %s", optarg);
+        std::printf("\n");
         break;
-      std::printf("option %s", long_options[option_index].name);
-      if (optarg)
-        std::printf(" with arg %s", optarg);
-      std::printf("\n");
-      break;
 
-    case 'v':
-      config.verbose = true;
-      break;
+      case 'v':
+        config.verbose = true;
+        break;
 
-    case 'd':
-      config.destination = std::string(optarg);
-      break;
+      case 'd':
+        config.destination = std::string(optarg);
+        break;
 
-    case 'n':
-      config.network = atoi(optarg);
-      break;
+      case 'n':
+        config.network = atoi(optarg);
+        break;
 
-    case 'c':
-      config.computation = atoi(optarg);
-      break;
+      case 'c':
+        config.computation = atoi(optarg);
+        break;
 
-    default:
-      printf("%c\n", c);
+      default:
+        printf("%c\n", c);
     }
   }
 

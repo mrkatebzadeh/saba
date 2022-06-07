@@ -24,17 +24,18 @@
 #ifndef ARGS_H
 #define ARGS_H
 #include <getopt.h>
+
 #include <iostream>
 #include <string>
 
 class Config {
-public:
+ public:
   bool verbose;
   int network;
   int computation;
   std::string destination;
 
-  friend std::ostream &operator<<(std::ostream &strm, Config const& a) {
+  friend std::ostream &operator<<(std::ostream &strm, Config const &a) {
     return strm << "Config( network:" << a.network
                 << ", computation: " << a.computation
                 << ", destination: " << a.destination << " )";

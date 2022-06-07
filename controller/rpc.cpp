@@ -23,38 +23,39 @@
 
 #include "controller.h"
 
-int app_register_handler(Controller* controller, std::string application_name) {
+int appRegisterHandler(Controller *controller, std::string application_name) {
   int sl = 0;
   auto application_fd = controller->name_to_app_table[application_name];
 
   switch (controller->algorithm) {
-  case AllocationAlgorithm::IB:
-    sl = controller->calculate_SL_by_IB(application_fd);
-    break;
-  case AllocationAlgorithm::IDEALMAXMIN:
-    sl = controller->calculate_SL_by_idealmaxmin(application_fd);
-    break;
-  case AllocationAlgorithm::IDEALSMART:
-    sl = controller->calculate_SL_by_idealsmart(application_fd);
-    break;
-  case AllocationAlgorithm::BESTFITSMART:
-    sl = controller->calculate_SL_by_bestfitsmart(application_fd);
-    break;
-  case AllocationAlgorithm::HIERARCHICALSMART:
-    sl = controller->calculate_SL_by_hierarchicalsmart(application_fd);
-    break;
-  default:
-    spdlog::error("Unknown allocation algorithm");
-    break;
+    case AllocationAlgorithm::IB:
+      sl = controller->calculatePriorityLevelsByMaxMin(application_fd);
+      break;
+    case AllocationAlgorithm::IDEALMAXMIN:
+      sl = controller->calculatePriorityLevelsByIdealMaxMin(application_fd);
+      break;
+    case AllocationAlgorithm::IDEALSMART:
+      sl = controller->calculatePriorityLevelsByIdealSmart(application_fd);
+      break;
+    case AllocationAlgorithm::BESTFITSMART:
+      sl = controller->calculatePriorityLevelsByBestFitSmart(application_fd);
+      break;
+    case AllocationAlgorithm::HIERARCHICALSMART:
+      sl = controller->calculatePriorityLevelsByHierarchicalSmart(
+          application_fd);
+      break;
+    default:
+      spdlog::error("Unknown allocation algorithm");
+      break;
   }
   spdlog::info("Application: {} got SL: {}", application_fd, sl);
   return sl;
 }
 
-int connection_create_handler(Controller *controller, std::string src,
-                              std::string dst, std::string application) {
-                                //TODO
-                              }
-void connection_destroy_handler(Controller *controller, int connection_fd) {
-  //TODO
+int connectionCreateHandler(Controller *controller, std::string src,
+                            std::string dst, std::string application) {
+  // TODO
+}
+void connectionDestroyHandler(Controller *controller, int connection_fd) {
+  // TODO
 }

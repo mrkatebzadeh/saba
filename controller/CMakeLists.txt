@@ -49,8 +49,8 @@ include_directories(${spdlog_SOURCE_DIR}/include/)
 
 include_directories(${rpc_SOURCE_DIR}/include/)
 
-add_library(scheduler rpc.cpp scheduler.cpp hierarchical_cluster.cpp scheduler_args.cpp)
+add_library(controller rpc.cpp controller.cpp hierarchical_cluster.cpp controller_args.cpp)
 
-add_executable(saba_scheduler main.cpp)
+add_executable(saba_controller main.cpp)
 
-target_link_libraries(saba_scheduler scheduler rpc spdlog::spdlog)
+target_link_libraries(saba_controller controller rpc spdlog::spdlog)

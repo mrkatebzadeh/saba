@@ -21,12 +21,12 @@
  * SOFTWARE.
  */
 
-#include "scheduler_args.h"
-#include "scheduler.h"
+#include "controller_args.h"
+#include "controller.h"
 
-SchedulerConfig parse_opt(int argc, char **argv) {
+ControllerConfig parse_opt(int argc, char **argv) {
   int c;
-  auto config = SchedulerConfig();
+  auto config = ControllerConfig();
   config.algorithm = std::string("hierarchicalsmart");
   config.port = 8585;
   config.verbose = true;

@@ -19,7 +19,7 @@ This package provides a smart/application-aware bandwidth allocator and consists
 - workload
 - saba_ibverbs
 - saba_socket
-- scheduler
+- Controller
 - test
 
 

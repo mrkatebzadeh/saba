@@ -1,5 +1,5 @@
 /**
- * scheduler/scheduler.h
+ * Controller/Controller.h
  * Copyright (c) 2021 M.R. Siavash Katebzadeh <mr.katebzadeh@gmail.com>
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -21,8 +21,8 @@
  * THE SOFTWARE.
  */
 
-#ifndef SCHEDULER_H
-#define SCHEDULER_H
+#ifndef CONTROLLER_H
+#define CONTROLLER_H
 #include "hierarchical_cluster.h"
 #include <cstdint>
 #include <map>
@@ -72,7 +72,7 @@ public:
   std::map<int, Connection> connections;
 };
 
-class Scheduler {
+class Controller {
 public:
   // parameters:
   AllocationAlgorithm algorithm;
@@ -107,9 +107,9 @@ public:
   std::vector<IBSwitch> get_path_switches(Connection connection);
 };
 
-int app_register_handler(Scheduler *scheduler, std::string application_name);
-int connection_create_handler(Scheduler *scheduler, std::string src,
+int app_register_handler(Controller *controller, std::string application_name);
+int connection_create_handler(Controller *controller, std::string src,
                               std::string dst, std::string application);
-void connection_destroy_handler(Scheduler *scheduler, int connection_fd);
+void connection_destroy_handler(Controller *controller, int connection_fd);
 
 #endif

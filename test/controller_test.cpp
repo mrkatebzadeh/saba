@@ -21,24 +21,24 @@
  * SOFTWARE.
  */
 
-#include "../scheduler/scheduler.h"
+#include "../controller/controller.h"
 #include <gtest/gtest.h>
 
-class SchedulerTest : public ::testing::Test {
+class ControllerTest : public ::testing::Test {
 protected:
   std::uint32_t app_fd;
   std::uint32_t conn_fd;
 };
 
-TEST_F(SchedulerTest, AppRegister) {
+TEST_F(ControllerTest, AppRegister) {
 }
 
-TEST_F(SchedulerTest, ConnectionCreate) {
+TEST_F(ControllerTest, ConnectionCreate) {
 }
 
-TEST_F(SchedulerTest, ConnectionDestroy) {
+TEST_F(ControllerTest, ConnectionDestroy) {
 }
 
-TEST_F(SchedulerTest, AppDeregister) {
+TEST_F(ControllerTest, AppDeregister) {
 }
 

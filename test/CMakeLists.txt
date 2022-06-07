@@ -74,21 +74,21 @@ target_link_libraries(
 )
 
 add_executable(
-  scheduler_test
-  scheduler_test.cpp
+  controller_test
+  controller_test.cpp
 )
 
-target_include_directories(scheduler_test PUBLIC ../include)
+target_include_directories(controller_test PUBLIC ../include)
 
 target_link_libraries(
-  scheduler_test
-  scheduler
+  controller_test
+  controller
   gtest_main
 )
 
 include(GoogleTest)
 gtest_discover_tests(socket_test)
-gtest_discover_tests(scheduler_test)
+gtest_discover_tests(controller_test)
 
 source_group(
   TREE "${PROJECT_SOURCE_DIR}/include"

@@ -1,5 +1,5 @@
 /**
- * scheduler/scheduler.cpp
+ * Controller/Controller.cpp
  * Copyright (c) 2021 M.R. Siavash Katebzadeh <mr.katebzadeh@gmail.com>
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -21,13 +21,13 @@
  * SOFTWARE.
  */
 
-#include "scheduler.h"
-#include "scheduler_args.h"
+#include "controller.h"
+#include "controller_args.h"
 #include <fstream>
 #include <numeric>
 #include <sstream>
 
-void Scheduler::load_profile_table(std::string profile_table_file_address) {
+void Controller::load_profile_table(std::string profile_table_file_address) {
   std::ifstream table_file(profile_table_file_address);
   std::string line, colname;
   double val;
@@ -63,13 +63,13 @@ void Scheduler::load_profile_table(std::string profile_table_file_address) {
   table_file.close();
 }
 
-void Scheduler::generate_slowdown_table() {
+void Controller::generate_slowdown_table() {
   for (auto record : profile_table) {
     slowdown_table[record.app].push_back(record.slowdown);
   }
 }
 
-void Scheduler::generate_sensitivity_table() {
+void Controller::generate_sensitivity_table() {
   // For now, just simple average. //TODO weighted average
   for (auto app : slowdown_table) {
     sensitivity_table[app.first] =
@@ -78,7 +78,7 @@ void Scheduler::generate_sensitivity_table() {
   }
 }
 
-void Scheduler::cluster_applications() {
+void Controller::cluster_applications() {
   int npoints = sensitivity_table.size();
 
   if (npoints == 0) {
@@ -117,7 +117,7 @@ void Scheduler::cluster_applications() {
   delete[] labels;
 }
 
-void Scheduler::cluster_SLs() {
+void Controller::cluster_SLs() {
   int npoints = available_SLs;
 
   if (npoints == 0) {
@@ -161,23 +161,23 @@ void Scheduler::cluster_SLs() {
   delete[] labels;
 }
 
-int Scheduler::calculate_SL_by_IB(uint32_t application_fd) { return 1; }
+int Controller::calculate_SL_by_IB(uint32_t application_fd) { return 1; }
 
-int Scheduler::calculate_SL_by_idealmaxmin(uint32_t application_fd) {
-
-  return 0; // TODO
-}
-
-int Scheduler::calculate_SL_by_bestfitsmart(uint32_t application_fd) {
+int Controller::calculate_SL_by_idealmaxmin(uint32_t application_fd) {
 
   return 0; // TODO
 }
 
-int Scheduler::calculate_SL_by_hierarchicalsmart(uint32_t application_fd) {
+int Controller::calculate_SL_by_bestfitsmart(uint32_t application_fd) {
+
+  return 0; // TODO
+}
+
+int Controller::calculate_SL_by_hierarchicalsmart(uint32_t application_fd) {
   return app_to_sl_table[application_fd];
 }
 
-int Scheduler::calculate_SL_by_idealsmart(uint32_t application_fd) {
+int Controller::calculate_SL_by_idealsmart(uint32_t application_fd) {
 
   return 0; // TODO
 }

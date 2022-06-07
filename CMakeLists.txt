@@ -45,6 +45,6 @@ if(NOT DEFINED ENV{SABA_NO_TEST})
 	add_subdirectory(test)
 endif()
 
-if(NOT DEFINED ENV{SABA_NO_SCHEDULER})
-	add_subdirectory(scheduler)
+if(NOT DEFINED ENV{SABA_NO_CONTROLLER})
+	add_subdirectory(controller)
 endif()

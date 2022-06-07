@@ -29,7 +29,7 @@
 
 #define IBMAXSLVL 8
 
-class SchedulerConfig {
+class ControllerConfig {
 public:
   bool verbose;
   int port;
@@ -38,13 +38,13 @@ public:
   std::string algorithm;
   std::string profile_table_file;
 
-  friend std::ostream &operator<<(std::ostream &strm, SchedulerConfig const& a) {
+  friend std::ostream &operator<<(std::ostream &strm, ControllerConfig const& a) {
     return strm << "Config( SLs:" << a.available_SLs
                 << ", VLs: " << a.available_VLs
                 << ", algorithm: " << a.algorithm << " )";
   }
 };
 
-SchedulerConfig parse_opt(int argc, char **argv);
+ControllerConfig parse_opt(int argc, char **argv);
 
 #endif

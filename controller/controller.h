@@ -27,7 +27,7 @@
 #include <nlopt.h>
 #include <rpc/server.h>
 #include <spdlog/spdlog.h>
-
+#include <spdlog/fmt/ostr.h>
 #include <cstdint>
 #include <map>
 #include <vector>

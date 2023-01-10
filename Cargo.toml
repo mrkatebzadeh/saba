@@ -1,11 +1,21 @@
 [package]
-name = "saba-controller"
+name = "saba"
 version = "0.1.0"
 edition = "2021"
-description = "The centralized controller of Saba Allocation Scheme"
+description = "Saba Bandwidth Allocation Scheme"
 repository = "https://github.com/mrkatebzadeh/saba-controller"
 license = "MIT"
 
-# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+[[bin]]
+name = "controller"
+path = "src/controller/main.rs"
+
+[[bin]]
+name = "connection_manager"
+path = "src/connection_manager/main.rs"
+
 
 [dependencies]
+toml = "0.5.10"
+clap = { version = "4.1.1", features = ["derive"] }
+serde = { version = "1.0.152", features = ["derive"] }

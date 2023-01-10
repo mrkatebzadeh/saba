@@ -1,7 +1,6 @@
 # saba-controller
 
 [![CI](https://github.com/mrkatebzadeh/saba-controller/workflows/CI/badge.svg)](https://github.com/mrkatebzadeh/saba-controller/actions)
-[![Coverage Status](https://coveralls.io/repos/github/mrkatebzadeh/saba-controller/badge.svg?branch=main)](https://coveralls.io/github/mrkatebzadeh/saba-controller?branch=main)
 
 ## Installation
 

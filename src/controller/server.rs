@@ -1,13 +1,13 @@
-use tonic::{transport::Server, Request, Response, Status};
 use init::init_server::{Init, InitServer};
 use init::{InitRequest, InitResponse};
-use log::{debug, info, warn, error};
+use log::{debug, error, info, warn};
+use tonic::{transport::Server, Request, Response, Status};
 
 pub mod init {
     tonic::include_proto!("init");
 }
 
-#[derive(Debug,Default)]
+#[derive(Debug, Default)]
 pub struct MyInit {}
 
 #[tonic::async_trait]
@@ -35,5 +35,3 @@ pub async fn serve(ip: String, port: u16) -> Result<(), Box<dyn std::error::Erro
 
     Ok(())
 }
-
-

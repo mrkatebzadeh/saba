@@ -8,7 +8,7 @@ use std::path::PathBuf;
 
 #[derive(Parser)]
 #[command(
-    about = "Centralized conteroller of Saba bandwidth allocation scheme",
+    about = "Connection manager of Saba bandwidth allocation scheme",
     version = "0.1.0",
     author = "M.R. Siavash Katebzadeh"
 )]
@@ -60,7 +60,7 @@ pub struct Config {
 pub fn get_config() -> Config {
     let mut config = Config {
         ip: "127.0.0.1".to_string(),
-        port: 8080,
+        port: 8081,
         command: Commands::Nop,
         verbose: 0,
     };

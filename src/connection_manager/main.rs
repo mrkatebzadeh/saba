@@ -1,59 +1,49 @@
-extern crate clap;
-extern crate toml;
+mod client;
+mod config;
+use std::thread;
 
-use clap::{Parser, Subcommand};
-use std::path::PathBuf;
+use config::{get_config, Commands};
+use log::{debug, error, info, warn};
 
-#[derive(Parser)]
-#[command(
-    about = "Connection manager of Saba bandwidth allocation scheme",
-    version = "0.1.0",
-    author = "M.R. Siavash Katebzadeh"
-)]
-struct Cli {
-    /// Sets a custom config file
-    #[arg(short, long, value_name = "FILE")]
-    config: Option<PathBuf>,
+#[tokio::main]
+async fn main() {
+    let config = get_config();
 
-    /// Turn debugging information on
-    #[arg(short, long, action = clap::ArgAction::Count)]
-    verbose: u8,
-
-    #[command(subcommand)]
-    command: Option<Commands>,
-}
-
-#[derive(Subcommand)]
-enum Commands {
-    Start,
-    Stop,
-    Status,
-}
-fn main() {
-    let cli = Cli::parse();
-
-    if let Some(config_path) = cli.config.as_deref() {
-        println!("Value for config: {}", config_path.display());
-    }
-
-    match cli.verbose {
-        0 => println!("Verbose mode is off"),
-        1 => println!("Verbose mode is kind of on"),
-        2 => println!("Verbose mode is on"),
-        _ => println!("Don't be crazy"),
-    }
-
-    match &cli.command {
-        Some(Commands::Start) => {
-            println!("Starting...");
+    simplelog::CombinedLogger::init(vec![
+        simplelog::TermLogger::new(
+            match config.verbose {
+                0 => simplelog::LevelFilter::Warn,
+                1 => simplelog::LevelFilter::Info,
+                2 => simplelog::LevelFilter::Debug,
+                _ => simplelog::LevelFilter::Trace,
+            },
+            simplelog::Config::default(),
+            simplelog::TerminalMode::Mixed,
+            simplelog::ColorChoice::Auto,
+        ),
+        simplelog::WriteLogger::new(
+            simplelog::LevelFilter::Info,
+            simplelog::Config::default(),
+            std::fs::File::create("connection_manager.log").unwrap(),
+        ),
+    ])
+    .unwrap();
+    debug!("Config: {:?}", config);
+    match config.command {
+        Commands::Start => {
+            info!("Starting connection manager...");
+            thread::spawn(move || {
+                client::connect(config.ip, config.port).unwrap();
+            })
+            .join()
+            .expect("Unable to start client");
         }
-        Some(Commands::Stop) => {
-            println!("Stopping...");
+        Commands::Stop => {
+            info!("Stopping...");
         }
-        Some(Commands::Status) => {
-            println!("Status...");
+        Commands::Status => {
+            info!("Status...");
         }
-        None => {}
+        Commands::Nop => {}
     }
 }
-

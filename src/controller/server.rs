@@ -1,6 +1,7 @@
 use tonic::{transport::Server, Request, Response, Status};
 use init::init_server::{Init, InitServer};
 use init::{InitRequest, InitResponse};
+use log::{debug, info, warn, error};
 
 pub mod init {
     tonic::include_proto!("init");
@@ -25,7 +26,7 @@ pub async fn serve(ip: String, port: u16) -> Result<(), Box<dyn std::error::Erro
     let addr = format!("{}:{}", ip, port).parse()?;
     let init = MyInit::default();
 
-    println!("Controller listening on {}", addr);
+    info!("Controller listening on {}", addr);
 
     Server::builder()
         .add_service(InitServer::new(init))

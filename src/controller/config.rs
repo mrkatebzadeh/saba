@@ -6,7 +6,6 @@ use clap::{Parser, Subcommand};
 use serde::Deserialize;
 use std::path::PathBuf;
 
-
 #[derive(Parser)]
 #[command(
     about = "Centralized conteroller of Saba bandwidth allocation scheme",
@@ -31,7 +30,7 @@ struct Cli {
 }
 
 
-#[derive(Subcommand)]
+#[derive(Subcommand,Debug)]
 pub enum Commands {
     Start,
     Stop,
@@ -50,10 +49,12 @@ struct ControllerConfig {
     port: Option<u16>,
 }
 
+#[derive(Debug)]
 pub struct Config {
     pub ip: String,
     pub port: u16,
     pub command: Commands,
+    pub verbose: u8,
 }
 
 // Returns the configuration of the controller
@@ -62,6 +63,7 @@ pub fn get_config() -> Config {
         ip: "127.0.0.1".to_string(),
         port: 8080,
         command: Commands::Nop,
+        verbose: 0,
     };
 
     let cli = Cli::parse();
@@ -82,11 +84,8 @@ pub fn get_config() -> Config {
         }
     }
 
-    match cli.verbose {
-        0 => println!("Verbose mode is off"),
-        1 => println!("Verbose mode is kind of on"),
-        2 => println!("Verbose mode is on"),
-        _ => println!("Don't be crazy"),
+    if Some(cli.verbose) != None {
+        config.verbose = cli.verbose;
     }
 
     if let Some(ip) = cli.ip {

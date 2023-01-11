@@ -2,9 +2,12 @@ extern crate clap;
 extern crate serde;
 extern crate toml;
 
+use std::thread;
 use clap::{Parser, Subcommand};
 use serde::Deserialize;
 use std::path::PathBuf;
+mod server;
+
 
 #[derive(Parser)]
 #[command(
@@ -52,7 +55,8 @@ struct Config {
     port: u16,
 }
 
-fn main() {
+#[tokio::main]
+async fn main() {
     let mut config = Config {
         ip: "127.0.0.1".to_string(),
         port: 8080,
@@ -94,6 +98,9 @@ fn main() {
     match &cli.command {
         Some(Commands::Start) => {
             println!("Starting...");
+            thread::spawn(move || {
+                server::serve(config.ip, config.port).unwrap();
+            }).join().expect("Unable to start server");
         }
         Some(Commands::Stop) => {
             println!("Stopping...");

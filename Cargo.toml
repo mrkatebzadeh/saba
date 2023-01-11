@@ -19,3 +19,11 @@ path = "src/connection_manager/main.rs"
 toml = "0.5.10"
 clap = { version = "4.1.1", features = ["derive"] }
 serde = { version = "1.0.152", features = ["derive"] }
+tonic = { version = "0.8.3", features = ["tls"] }
+prost = "0.11.6"
+tokio = { version = "1.24.2", features = ["full"] }
+
+
+
+[build-dependencies]
+tonic-build = "0.8.3"

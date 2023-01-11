@@ -1,0 +1,14 @@
+syntax = "proto3";
+package init;
+
+service Init {
+    rpc Init (InitRequest) returns (InitResponse);
+}
+
+message InitRequest {
+  string url = 1;
+}
+
+message InitResponse {
+    string confirmation = 1;
+}

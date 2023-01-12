@@ -16,6 +16,9 @@ struct Cli {
     #[arg(short, long, value_name = "FILE")]
     config: Option<PathBuf>,
 
+    #[arg(short, long, value_name = "FILE")]
+    topology_file: Option<PathBuf>,
+
     #[arg(short, long, action = clap::ArgAction::Count)]
     verbose: u8,
 
@@ -50,6 +53,7 @@ struct ControllerConfig {
 
 #[derive(Debug)]
 pub struct Config {
+    pub topology_file: String,
     pub ip: String,
     pub port: u16,
     pub command: Commands,
@@ -59,6 +63,7 @@ pub struct Config {
 // Returns the configuration of the controller
 pub fn get_config() -> Config {
     let mut config = Config {
+        topology_file: String::from("topology"),
         ip: "127.0.0.1".to_string(),
         port: 8080,
         command: Commands::Nop,
@@ -80,6 +85,9 @@ pub fn get_config() -> Config {
             if let Some(port) = controller_config.port {
                 config.port = port;
             }
+            if let Some(topology_file) = cli.topology_file.as_deref() {
+                config.topology_file = topology_file.to_string_lossy().to_string();
+            }
         }
     }
 
@@ -97,6 +105,10 @@ pub fn get_config() -> Config {
 
     if let Some(command) = cli.command {
         config.command = command;
+    }
+
+    if let Some(topology_file) = cli.topology_file.as_deref() {
+        config.topology_file = topology_file.to_string_lossy().to_string();
     }
 
     config

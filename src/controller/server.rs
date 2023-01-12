@@ -15,7 +15,7 @@ impl Init for MyInit {
     async fn init(&self, request: Request<InitRequest>) -> Result<Response<InitResponse>, Status> {
         println!("Got a request: {:?}", request);
         let reply = init::InitResponse {
-            confirmation: "Hello from the controller!".into(),
+            confirmation: "Client is connected to the controller".into(),
         };
         Ok(Response::new(reply))
     }

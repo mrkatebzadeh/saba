@@ -34,7 +34,9 @@ pub struct Switch {
 }
 
 impl Switch {
-    pub fn new(name: String, ip: String, number_of_ports: u16, weights: Vec<u16>) -> Switch {
+    pub fn new(name: &str, ip: &str, number_of_ports: u16, weights: Vec<u16>) -> Switch {
+        let name = String::from(name);
+        let ip = String::from(ip);
         Switch {
             name,
             ip,

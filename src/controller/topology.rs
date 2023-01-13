@@ -1,11 +1,11 @@
+use crate::switch::{NetworkNode, Server, Switch};
+use log::{debug, error, info, warn};
 use std::collections::HashMap;
 use std::collections::VecDeque;
-use crate::switch::{NetworkNode, Switch, Server};
-use log::{debug, error, info, warn};
 
 #[derive(Debug)]
 pub struct Topology {
-    nodes: HashMap<String,  Box<dyn NetworkNode> >,
+    nodes: HashMap<String, Box<dyn NetworkNode>>,
     adjacency: HashMap<String, Vec<String>>,
 }
 
@@ -19,14 +19,14 @@ impl Topology {
         visited.insert(start, true);
 
         while !queue.is_empty() {
-            let &current = self.nodes[queue.pop_front().unwrap()];
+            let current = self.nodes[queue.pop_front().unwrap()];
             path.push(current.get_name().to_string());
 
-            if self.nodes[current].get_ip() == end {
+            if current.get_ip().to_string() == end {
                 return Some(path);
             }
 
-            if let Some(adjacent) = self.adjacency.get(current.get_name()) {
+            if let Some(adjacent) = self.adjacency.get(&current.get_name()) {
                 for node in adjacent {
                     if !visited.contains_key(&node as &str) {
                         visited.insert(node, true);
@@ -38,9 +38,9 @@ impl Topology {
         None
     }
 
-    fn add_node(&mut self, new_node: dyn NetworkNode, adjacent: Vec<String>) {
-        self.nodes.insert(new_node.get_name().clone(), new_node);
-        self.adjacency.insert(new_node.get_name().clone(), adjacent);
+    fn add_server(&mut self, new_server: Server, adjacent: Vec<String>) {
+        self.nodes.insert(new_server.get_name().clone(), Box::new(new_server));
+        self.adjacency.insert(new_server.get_name().clone(), adjacent);
     }
 
     pub fn print_topology(&self) {
@@ -78,18 +78,13 @@ impl Topology {
                     .map(|x| x.trim().parse::<u16>().unwrap())
                     .collect();
                 let new_switch = Switch::new(node_name, node_ip, number_of_ports, weights);
-                let adjacent: Vec<String> = line[5]
-                    .split(" ")
-                    .map(|x| x.to_string())
-                    .collect();
+                let adjacent: Vec<String> = line[5].split(" ").map(|x| x.to_string()).collect();
                 topology.add_node(new_switch, adjacent);
                 debug!("Added switch: {:?}", new_switch);
             } else {
                 let new_server = Server::new(node_name, node_ip);
-                let adjacent: Vec<String> = line[3]
-                    .split(" ")
-                    .map(|x| x.trim().to_string())
-                    .collect();
+                let adjacent: Vec<String> =
+                    line[3].split(" ").map(|x| x.trim().to_string()).collect();
                 topology.add_node(new_server, adjacent);
                 debug!("Added server: {:?}", new_server);
             }

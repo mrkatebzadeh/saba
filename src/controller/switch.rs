@@ -3,6 +3,7 @@ use std::fmt::Debug;
 pub trait NetworkNode {
     fn get_name(&self) -> String;
     fn get_ip(&self) -> String;
+    fn get_weights(&self) -> Vec<u16>;
 }
 
 impl Debug for dyn NetworkNode {
@@ -15,13 +16,14 @@ impl Debug for dyn NetworkNode {
 pub struct Server {
     pub name: String,
     pub ip: String,
+    pub weights: Vec<u16>,
 }
 
 impl Server {
-    pub fn new(name: &str, ip: &str) -> Server {
+    pub fn new(name: &str, ip: &str, weights: Vec<u16>) -> Server {
         let name = name.to_string();
         let ip = ip.to_string();
-        Server { name, ip }
+        Server { name, ip, weights }
     }
 }
 
@@ -29,8 +31,13 @@ impl NetworkNode for Server {
     fn get_name(&self) -> String {
         self.name.clone()
     }
+
     fn get_ip(&self) -> String {
         self.ip.clone()
+    }
+
+    fn get_weights(&self) -> Vec<u16> {
+        self.weights.clone()
     }
 }
 
@@ -58,7 +65,12 @@ impl NetworkNode for Switch {
     fn get_name(&self) -> String {
         self.name.clone()
     }
+
     fn get_ip(&self) -> String {
         self.ip.clone()
+    }
+
+    fn get_weights(&self) -> Vec<u16> {
+        self.weights.clone()
     }
 }

@@ -85,26 +85,24 @@ impl Topology {
             if node_type == "switch" {
                 let number_of_ports = line[3].trim().parse::<u16>().unwrap();
                 let weights: Vec<u16> = line[4]
+                    .trim()
                     .split(" ")
-                    .map(|x| {
-                        x.trim().parse::<u16>().unwrap()
-                    })
+                    .map(|x| x.trim().parse::<u16>().unwrap())
                     .collect();
                 let new_switch = Switch::new(node_name, node_ip, number_of_ports, weights);
-                let adjacent: Vec<String> = line[5]
-                    .split(" ")
-                    .map(|x| {
-                        x.to_string()
-                    })
-                    .collect();
+                let adjacent: Vec<String> = line[5].split(" ").map(|x| x.to_string()).collect();
                 debug!("Added switch: {:?}", new_switch);
                 topology.add_switch(new_switch, adjacent);
             } else {
-                let new_server = Server::new(node_name, node_ip);
-                let adjacent: Vec<String> =
-                    line[3].split(" ").map(|x| x.trim().to_string()).collect();
+                let weights: Vec<u16> = line[3]
+                    .trim()
+                    .split(" ")
+                    .map(|x| x.trim().parse::<u16>().unwrap())
+                    .collect();
+                let switch = line[4].trim();
+                let new_server = Server::new(node_name, node_ip, weights);
                 debug!("Added server: {:?}", new_server);
-                topology.add_server(new_server, adjacent);
+                topology.add_server(new_server, vec![switch.to_string()]);
             }
         }
         topology

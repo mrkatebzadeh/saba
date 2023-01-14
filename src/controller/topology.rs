@@ -1,4 +1,4 @@
-use crate::switch::{NetworkNode, Server, Switch};
+use crate::node::{NetworkNode, Server, Switch};
 use log::{debug, error, info, warn};
 use std::collections::HashMap;
 use std::collections::VecDeque;

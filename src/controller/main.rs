@@ -33,7 +33,8 @@ async fn main() {
     .unwrap();
     debug!("Config: {:?}", config);
 
-    let mut topology = Topology::generate_topology_from_file(config.topology_file);
+    let topology = Topology::generate_topology_from_file(config.topology_file);
+    topology.print_topology();
     match config.command {
         Commands::Start => {
             info!("Starting controller...");

@@ -1,7 +1,14 @@
+use std::fmt::Debug;
 
 pub trait NetworkNode {
     fn get_name(&self) -> String;
     fn get_ip(&self) -> String;
+}
+
+impl Debug for dyn NetworkNode {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
+        write!(f, "NetworkNode{{{}}}", self.get_name())
+    }
 }
 
 #[derive(Debug)]
@@ -11,7 +18,9 @@ pub struct Server {
 }
 
 impl Server {
-    pub fn new(name: String, ip: String) -> Server {
+    pub fn new(name: &str, ip: &str) -> Server {
+        let name = name.to_string();
+        let ip = ip.to_string();
         Server { name, ip }
     }
 }

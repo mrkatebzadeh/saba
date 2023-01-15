@@ -10,27 +10,31 @@ pub struct Topology {
 }
 
 impl Topology {
-    fn dfs(&self, start: &str, end: &str) -> Option<Vec<String>> {
+    pub fn dfs(&self, start: &str, end: &str) -> Option<Vec<String>> {
         let mut visited = HashMap::new();
         let mut queue = VecDeque::new();
-        let mut path = vec![];
+        let path = vec![String::from(start)];
 
-        queue.push_back(start);
+        queue.push_back((start, path));
         visited.insert(start, true);
 
+        debug!("Starting DFS from {} to {}", &start, &end);
         while !queue.is_empty() {
-            let current = &self.nodes[queue.pop_front().unwrap()];
-            path.push(current.get_name().to_string());
+            let top = queue.pop_front().unwrap();
+            let (current, path) = (&self.nodes[top.0], top.1);
 
-            if current.get_ip() == end {
+            if current.get_name() == end {
+                debug!("Found path: {:?}", path);
                 return Some(path);
             }
 
             if let Some(adjacent) = self.adjacency.get(&current.get_name()) {
                 for node in adjacent {
-                    if !visited.contains_key(&node as &str) {
+                    if !visited.contains_key(node as &str) {
                         visited.insert(node, true);
-                        queue.push_back(node);
+                        let mut new_path = path.clone();
+                        new_path.push(node.to_string());
+                        queue.push_back((node, new_path));
                     }
                 }
             }
@@ -72,13 +76,13 @@ impl Topology {
         };
 
         let file = std::fs::read_to_string(filename).unwrap();
-        let lines: Vec<&str> = file.split("\n").collect();
+        let lines: Vec<&str> = file.split('\n').collect();
         for line in lines {
             let line = line.trim();
             if line.is_empty() {
                 continue;
             }
-            let line: Vec<&str> = line.split(",").collect();
+            let line: Vec<&str> = line.split(',').collect();
             let node_name = line[0].trim();
             let node_ip = line[1].trim();
             let node_type = line[2].trim();
@@ -86,17 +90,17 @@ impl Topology {
                 let number_of_ports = line[3].trim().parse::<u16>().unwrap();
                 let weights: Vec<u16> = line[4]
                     .trim()
-                    .split(" ")
+                    .split(' ')
                     .map(|x| x.trim().parse::<u16>().unwrap())
                     .collect();
                 let new_switch = Switch::new(node_name, node_ip, number_of_ports, weights);
-                let adjacent: Vec<String> = line[5].split(" ").map(|x| x.to_string()).collect();
+                let adjacent: Vec<String> = line[5].split(' ').map(|x| x.to_string()).collect();
                 debug!("Added switch: {:?}", new_switch);
                 topology.add_switch(new_switch, adjacent);
             } else {
                 let weights: Vec<u16> = line[3]
                     .trim()
-                    .split(" ")
+                    .split(' ')
                     .map(|x| x.trim().parse::<u16>().unwrap())
                     .collect();
                 let switch = line[4].trim();
@@ -106,5 +110,35 @@ impl Topology {
             }
         }
         topology
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_dfs() {
+        let mut topology = Topology::new();
+        let s1 = Server::new("s1", "127.0.0.1", vec![1, 2, 3]);
+        let s2 = Server::new("s2", "127.0.0.2", vec![1, 2, 3]);
+        let switch1 = Switch::new("switch1", "127.0.0.3", 3, vec![1, 2, 3]);
+        topology.add_server(s1, vec!["switch1".to_string()]);
+        topology.add_server(s2, vec!["switch1".to_string()]);
+
+        topology.add_switch(switch1, vec!["s1".to_string(), "s2".to_string()]);
+        assert!(topology.dfs("s1", "s2").unwrap() == vec!["s1", "switch1", "s2"]);
+    }
+
+    #[test]
+    fn test_dfs_no_path() {
+        let mut topology = Topology::new();
+        let s1 = Server::new("s1", "127.0.0.1", vec![1, 2, 3]);
+        let s2 = Server::new("s2", "127.0.0.2", vec![1, 2, 3]);
+        let switch1 = Switch::new("switch1", "127.0.0.3", 3, vec![1, 2, 3]);
+        topology.add_server(s1, vec!["switch1".to_string()]);
+        topology.add_server(s2, vec![]);
+        topology.add_switch(switch1, vec!["s1".to_string()]);
+        assert!(topology.dfs("s1", "s2").is_none());
     }
 }

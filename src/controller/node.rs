@@ -74,3 +74,24 @@ impl NetworkNode for Switch {
         self.weights.clone()
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_server() {
+        let server = Server::new("server1", "127.0.0.1", vec![1, 2, 3]);
+        assert_eq!(server.get_name(), "server1");
+        assert_eq!(server.get_ip(), "127.0.0.1");
+        assert_eq!(server.get_weights(), vec![1, 2, 3]);
+    }
+
+    #[test]
+    fn test_switch() {
+        let switch = Switch::new("switch1", "127.0.0.1", 4, vec![1, 2, 3]);
+        assert_eq!(switch.get_name(), "switch1");
+        assert_eq!(switch.get_ip(), "127.0.0.1");
+        assert_eq!(switch.get_weights(), vec![1, 2, 3]);
+    }
+}

@@ -1,6 +1,6 @@
 mod config;
-mod server;
 mod node;
+mod server;
 mod topology;
 
 use config::{get_config, Commands};

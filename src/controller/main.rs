@@ -4,7 +4,7 @@ mod server;
 mod topology;
 
 use config::{get_config, Commands};
-use log::{debug, error, info, warn};
+use log::{debug, info};
 use std::thread;
 use topology::Topology;
 

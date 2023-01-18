@@ -1,5 +1,5 @@
 use init::{init_client::InitClient, InitRequest};
-use log::{debug, error, info, warn};
+use log::{debug};
 use std::io::stdin;
 pub mod init {
     tonic::include_proto!("init");

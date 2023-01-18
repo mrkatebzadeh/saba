@@ -1,5 +1,5 @@
 use crate::node::{NetworkNode, Server, Switch};
-use log::{debug, error, info, warn};
+use log::{debug};
 use std::collections::HashMap;
 use std::collections::VecDeque;
 
@@ -10,6 +10,7 @@ pub struct Topology {
 }
 
 impl Topology {
+    #[allow(dead_code)]
     pub fn dfs(&self, start: &str, end: &str) -> Option<Vec<String>> {
         let mut visited = HashMap::new();
         let mut queue = VecDeque::new();
@@ -62,6 +63,7 @@ impl Topology {
 }
 
 impl Topology {
+    #[allow(dead_code)]
     pub fn new() -> Topology {
         Topology {
             nodes: HashMap::new(),

@@ -3,7 +3,7 @@ mod config;
 use std::thread;
 
 use config::{get_config, Commands};
-use log::{debug, error, info, warn};
+use log::{debug, info};
 
 #[tokio::main]
 async fn main() {

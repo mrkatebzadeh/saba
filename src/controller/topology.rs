@@ -1,5 +1,5 @@
 use crate::node::{NetworkNode, Server, Switch};
-use log::{debug};
+use log::debug;
 use std::collections::HashMap;
 use std::collections::VecDeque;
 

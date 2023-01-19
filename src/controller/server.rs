@@ -1,6 +1,6 @@
 use init::init_server::{Init, InitServer};
 use init::{InitRequest, InitResponse};
-use log::{info};
+use log::info;
 use tonic::{transport::Server, Request, Response, Status};
 
 pub mod init {

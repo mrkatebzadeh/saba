@@ -57,7 +57,7 @@ impl Topology {
 
     pub fn print_topology(&self) {
         for (node, adjacent) in self.adjacency.iter() {
-            println!("{}: {:?}", node, adjacent);
+            println!("{node}: {adjacent:?}");
         }
     }
 }
@@ -97,7 +97,7 @@ impl Topology {
                     .collect();
                 let new_switch = Switch::new(node_name, node_ip, number_of_ports, weights);
                 let adjacent: Vec<String> = line[5].split(' ').map(|x| x.to_string()).collect();
-                debug!("Added switch: {:?}", new_switch);
+                debug!("Added switch: {new_switch:?}");
                 topology.add_switch(new_switch, adjacent);
             } else {
                 let weights: Vec<u16> = line[3]
@@ -107,7 +107,7 @@ impl Topology {
                     .collect();
                 let switch = line[4].trim();
                 let new_server = Server::new(node_name, node_ip, weights);
-                debug!("Added server: {:?}", new_server);
+                debug!("Added server: {new_server:?}");
                 topology.add_server(new_server, vec![switch.to_string()]);
             }
         }

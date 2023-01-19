@@ -7,7 +7,7 @@ pub mod init {
 
 #[tokio::main]
 pub async fn connect(ip: String, port: u16) -> Result<(), Box<dyn std::error::Error>> {
-    let addr: String = format!("http://{}:{}", ip, port).parse()?;
+    let addr: String = format!("http://{ip}:{port}").parse()?;
     debug!("Connecting to {}", addr);
     let mut client = InitClient::connect(addr).await?;
     loop {

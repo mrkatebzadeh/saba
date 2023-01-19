@@ -13,7 +13,7 @@ pub struct MyInit {}
 #[tonic::async_trait]
 impl Init for MyInit {
     async fn init(&self, request: Request<InitRequest>) -> Result<Response<InitResponse>, Status> {
-        println!("Got a request: {:?}", request);
+        println!("Got a request: {request:?}");
         let reply = init::InitResponse {
             confirmation: "Client is connected to the controller".into(),
         };
@@ -23,7 +23,7 @@ impl Init for MyInit {
 
 #[tokio::main]
 pub async fn serve(ip: String, port: u16) -> Result<(), Box<dyn std::error::Error>> {
-    let addr = format!("{}:{}", ip, port).parse()?;
+    let addr = format!("{ip}:{port}").parse()?;
     let init = MyInit::default();
 
     info!("Controller listening on {}", addr);

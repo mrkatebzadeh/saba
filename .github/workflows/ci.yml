@@ -140,7 +140,7 @@ jobs:
         uses: actions-rs/tarpaulin@v0.1
         with:
           version: '0.15.0'
-          args: '-- --test-threads 1'
+          args: '--all-features --workspace --ignore-tests --out Lcov -- --test-threads 1'
       - name: Upload to Coveralls
         # upload only if push
         if: ${{ github.event_name == 'push' }}

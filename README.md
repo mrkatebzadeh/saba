@@ -1,7 +1,7 @@
 # saba-controller
 
 [![CI](https://github.com/mrkatebzadeh/saba-controller/workflows/CI/badge.svg)](https://github.com/mrkatebzadeh/saba-controller/actions)
-
+[![Coverage](https://img.shields.io/coverallsCoverage/github/mrkatebzadeh/saba-controller?branch=main)](https://github.com/mrkatebzadeh/saba-controller/actions)
 ## Installation
 
 ### Cargo

@@ -43,18 +43,21 @@ impl Topology {
         None
     }
 
+    #[allow(dead_code)]
     fn add_server(&mut self, new_server: Server, adjacent: Vec<String>) {
         let name = new_server.get_name();
         self.nodes.insert(name.clone(), Box::new(new_server));
         self.adjacency.insert(name, adjacent);
     }
 
+    #[allow(dead_code)]
     fn add_switch(&mut self, new_switch: Switch, adjacent: Vec<String>) {
         let name = new_switch.get_name();
         self.nodes.insert(name.clone(), Box::new(new_switch));
         self.adjacency.insert(name, adjacent);
     }
 
+    #[allow(dead_code)]
     pub fn print_topology(&self) {
         for (node, adjacent) in self.adjacency.iter() {
             println!("{node}: {adjacent:?}");
@@ -71,6 +74,7 @@ impl Topology {
         }
     }
 
+    #[allow(dead_code)]
     pub fn generate_topology_from_file(filename: String) -> Topology {
         let mut topology = Topology {
             nodes: HashMap::new(),
@@ -143,4 +147,11 @@ mod tests {
         topology.add_switch(switch1, vec!["s1".to_string()]);
         assert!(topology.dfs("s1", "s2").is_none());
     }
+
+    #[test]
+    fn test_dfs_from_file() {
+        let topology = Topology::generate_topology_from_file("tests/topology.csv".to_string());
+        assert!(topology.dfs("switch1", "server1").unwrap() == vec!["switch1", "switch4", "server1"]);
+    }
+    
 }

@@ -6,7 +6,6 @@ mod topology;
 use config::{get_config, Commands};
 use log::{debug, info};
 use std::thread;
-use topology::Topology;
 
 #[tokio::main]
 async fn main() {
@@ -33,8 +32,6 @@ async fn main() {
     .unwrap();
     debug!("Config: {:?}", config);
 
-    let topology = Topology::generate_topology_from_file(config.topology_file);
-    topology.print_topology();
     match config.command {
         Commands::Start => {
             info!("Starting controller...");

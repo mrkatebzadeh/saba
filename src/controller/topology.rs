@@ -56,12 +56,14 @@ impl Topology {
         self.nodes.insert(name.clone(), Box::new(new_switch));
         self.adjacency.insert(name, adjacent);
     }
+}
 
-    #[allow(dead_code)]
-    pub fn print_topology(&self) {
+impl std::fmt::Display for Topology {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         for (node, adjacent) in self.adjacency.iter() {
-            println!("{node}: {adjacent:?}");
+            write!(f, "{}: {:?}", node, adjacent)?
         }
+        Ok(())
     }
 }
 
@@ -151,7 +153,8 @@ mod tests {
     #[test]
     fn test_dfs_from_file() {
         let topology = Topology::generate_topology_from_file("tests/topology.csv".to_string());
-        assert!(topology.dfs("switch1", "server1").unwrap() == vec!["switch1", "switch4", "server1"]);
+        assert!(
+            topology.dfs("switch1", "server1").unwrap() == vec!["switch1", "switch4", "server1"]
+        );
     }
-    
 }

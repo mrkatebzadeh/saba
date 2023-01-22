@@ -20,6 +20,7 @@ pub struct Server {
 }
 
 impl Server {
+    #[allow(dead_code)]
     pub fn new(name: &str, ip: &str, weights: Vec<u16>) -> Server {
         let name = name.to_string();
         let ip = ip.to_string();
@@ -50,6 +51,7 @@ pub struct Switch {
 }
 
 impl Switch {
+    #[allow(dead_code)]
     pub fn new(name: &str, ip: &str, number_of_ports: u16, weights: Vec<u16>) -> Switch {
         let name = String::from(name);
         let ip = String::from(ip);

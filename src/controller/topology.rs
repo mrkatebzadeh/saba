@@ -61,7 +61,7 @@ impl Topology {
 impl std::fmt::Display for Topology {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         for (node, adjacent) in self.adjacency.iter() {
-            write!(f, "{}: {:?}", node, adjacent)?
+            write!(f, "{node}: {adjacent:?}")?
         }
         Ok(())
     }
@@ -153,6 +153,7 @@ mod tests {
     #[test]
     fn test_dfs_from_file() {
         let topology = Topology::generate_topology_from_file("tests/topology.csv".to_string());
+        println!("{topology:?}");
         assert!(
             topology.dfs("switch1", "server1").unwrap() == vec!["switch1", "switch4", "server1"]
         );

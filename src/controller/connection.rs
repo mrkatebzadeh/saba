@@ -9,3 +9,14 @@ impl Connection {
     }
 }
 
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_connection() {
+        let connection = Connection::new("a".to_string(), "b".to_string());
+        assert_eq!(connection.src, "a");
+        assert_eq!(connection.dst, "b");
+    }
+}

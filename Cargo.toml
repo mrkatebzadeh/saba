@@ -16,7 +16,7 @@ path = "src/connection_manager/main.rs"
 
 
 [dependencies]
-toml = "0.5.10"
+toml = "0.5.11"
 clap = { version = "4.1.1", features = ["derive"] }
 serde = { version = "1.0.152", features = ["derive"] }
 tonic = { version = "0.8.3", features = ["tls"] }

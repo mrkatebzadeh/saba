@@ -1,8 +1,8 @@
 mod config;
 mod node;
+mod profile;
 mod server;
 mod topology;
-mod profile;
 
 use config::{get_config, Commands};
 use log::{debug, info};

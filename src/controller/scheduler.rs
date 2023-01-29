@@ -146,10 +146,23 @@ impl Scheduler {
     fn allocate_sabamean(&mut self) {
         unimplemented!(); // TODO
     }
+
+    #[allow(dead_code)]
+    pub fn read_profile_table_from_file(filename: &str) -> Result<Vec<ProfileRecord>, String> {
+        let mut profile_table = Vec::new();
+        let mut reader = csv::Reader::from_path(filename).map_err(|e| e.to_string())?;
+        for result in reader.deserialize() {
+            let record: ProfileRecord = result.map_err(|e| e.to_string())?;
+            profile_table.push(record);
+        }
+        Ok(profile_table)
+    }
 }
 
 #[cfg(test)]
 mod tests {
+    use crate::profile::BandwidthValuePercent;
+
     use super::*;
 
     #[test]
@@ -215,5 +228,23 @@ mod tests {
         assert_eq!(scheduler.priority_to_app_table.len(), 0);
         assert_eq!(scheduler.connection_to_app_table.len(), 0);
         assert_eq!(scheduler.app_to_priority_table.len(), 0);
+    }
+
+    #[test]
+    fn test_read_profile_table_from_file() {
+        let filename = "tests/profile.csv";
+        let profile_table = Scheduler::read_profile_table_from_file(filename).unwrap();
+        assert_eq!(profile_table.len(), 2);
+        assert_eq!(profile_table[0].name(), "app1");
+        assert_eq!(*profile_table[0].bw(), BandwidthValuePercent::Ten);
+        assert_eq!(profile_table[0].time(), 1);
+        assert_eq!(profile_table[0].dataset_size(), 1);
+        assert_eq!(profile_table[0].number_of_nodes(), 1);
+
+        assert_eq!(profile_table[1].name(), "app1");
+        assert_eq!(*profile_table[1].bw(), BandwidthValuePercent::TwentyFive);
+        assert_eq!(profile_table[1].time(), 2);
+        assert_eq!(profile_table[1].dataset_size(), 1);
+        assert_eq!(profile_table[1].number_of_nodes(), 1);
     }
 }

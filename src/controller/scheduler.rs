@@ -18,7 +18,7 @@ impl AllocationAlgorithm {
             "idealmaxmin" => Ok(AllocationAlgorithm::IdealMaxMin),
             "sabahierarchical" => Ok(AllocationAlgorithm::SabaHierarchical),
             "sabamean" => Ok(AllocationAlgorithm::SabaMean),
-            _ => Err(format!("Unknown allocation algorithm: {}", s)),
+            _ => Err(format!("Unknown allocation algorithm: {s}")),
         }
     }
 

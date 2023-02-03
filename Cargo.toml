@@ -16,8 +16,8 @@ path = "src/connection_manager/main.rs"
 
 
 [dependencies]
-toml = "0.5.11"
-clap = { version = "4.1.1", features = ["derive"] }
+toml = "0.7.0"
+clap = { version = "4.1.4", features = ["derive"] }
 serde = { version = "1.0.152", features = ["derive"] }
 tonic = { version = "0.8.3", features = ["tls"] }
 prost = "0.11.6"
@@ -28,4 +28,4 @@ csv = "1.1"
 
 
 [build-dependencies]
-tonic-build = "0.8.3"
+tonic-build = "0.8.4"

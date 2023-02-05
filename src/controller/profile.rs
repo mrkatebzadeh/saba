@@ -1,6 +1,6 @@
 use serde::Deserialize;
 
-#[derive(Debug, Deserialize)]
+#[derive(Debug, Deserialize, Clone)]
 #[allow(dead_code)]
 pub enum BandwidthValuePercent {
     Five,
@@ -33,7 +33,7 @@ impl PartialEq for BandwidthValuePercent {
 }
 impl Eq for BandwidthValuePercent {}
 
-#[derive(Debug, Deserialize)]
+#[derive(Debug, Deserialize, Clone)]
 pub struct ProfileRecord {
     app: String,
     dataset_size: u16,

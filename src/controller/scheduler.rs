@@ -61,7 +61,10 @@ impl AllocationRecord {
 pub struct Scheduler {
     allocation_algorithm: AllocationAlgorithm,
     priority_levels: u8,
-    profile_table: Vec<ProfileRecord>,
+
+    //app,dataset_size,number_of_nodes,bw,time
+    profile_table: HashMap<String, Vec<ProfileRecord>>,
+    //app,src,dst,bw,priority
     allocation_table: Vec<AllocationRecord>,
 
     slowdown_table: HashMap<String, Vec<f32>>,
@@ -76,7 +79,7 @@ impl Scheduler {
     pub fn new(
         allocation_algorithm: AllocationAlgorithm,
         priority_levels: u8,
-        profile_table: Vec<ProfileRecord>,
+        profile_table: HashMap<String, Vec<ProfileRecord>>,
     ) -> Self {
         Scheduler {
             allocation_algorithm,
@@ -201,22 +204,31 @@ mod tests {
     fn test_scheduler_new() {
         let allocation_algorithm = AllocationAlgorithm::InfiniBand;
         let priority_levels = 3;
-        let profile_table = vec![
-            ProfileRecord::new(
+        let profile_table: HashMap<String, Vec<ProfileRecord>> = [
+            (
                 "app1".to_string(),
-                1,
-                2,
-                crate::profile::BandwidthValuePercent::Ten,
-                1,
+                vec![ProfileRecord::new(
+                    "app1".to_string(),
+                    1,
+                    2,
+                    crate::profile::BandwidthValuePercent::Ten,
+                    1,
+                )],
             ),
-            ProfileRecord::new(
-                "app1".to_string(),
-                1,
-                2,
-                crate::profile::BandwidthValuePercent::Ten,
-                2,
+            (
+                "app2".to_string(),
+                vec![ProfileRecord::new(
+                    "app1".to_string(),
+                    1,
+                    2,
+                    crate::profile::BandwidthValuePercent::Ten,
+                    2,
+                )],
             ),
-        ];
+        ]
+        .iter()
+        .cloned()
+        .collect();
         let scheduler =
             Scheduler::new(allocation_algorithm.clone(), priority_levels, profile_table);
         assert_eq!(scheduler.allocation_algorithm, allocation_algorithm);

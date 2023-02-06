@@ -1,4 +1,5 @@
 use crate::connection::Connection;
+use crate::profile::BandwidthValuePercent;
 use crate::profile::ProfileRecord;
 use std::collections::HashMap;
 
@@ -160,6 +161,17 @@ impl Scheduler {
         }
         Ok(profile_table)
     }
+
+    #[allow(dead_code)]
+    fn get_time_with_unthrottled_bw(&self, app: &str) -> Option<u16> {
+        let profile_table = self.profile_table.get(app)?;
+        for record in profile_table {
+            if *record.bw() == BandwidthValuePercent::Hundred {
+                return Some(record.time());
+            }
+        }
+        None
+    }
 }
 
 #[cfg(test)]
@@ -246,7 +258,7 @@ mod tests {
     fn test_read_profile_table_from_file() {
         let filename = "tests/profile.csv";
         let profile_table = Scheduler::read_profile_table_from_file(filename).unwrap();
-        assert_eq!(profile_table.len(), 2);
+        assert_eq!(profile_table.len(), 3);
         assert_eq!(profile_table[0].name(), "app1");
         assert_eq!(*profile_table[0].bw(), BandwidthValuePercent::Ten);
         assert_eq!(profile_table[0].time(), 1);
@@ -258,5 +270,21 @@ mod tests {
         assert_eq!(profile_table[1].time(), 2);
         assert_eq!(profile_table[1].dataset_size(), 1);
         assert_eq!(profile_table[1].number_of_nodes(), 1);
+    }
+
+    #[test]
+    fn test_get_time_with_unthrottled_bw() {
+        let filename = "tests/profile.csv";
+        let profile_table = Scheduler::read_profile_table_from_file(filename).unwrap();
+        let scheduler = Scheduler::new(
+            AllocationAlgorithm::InfiniBand,
+            3,
+            profile_table
+                .iter()
+                .map(|record| (record.name().to_string(), vec![record.clone()]))
+                .collect(),
+        );
+        assert_eq!(scheduler.get_time_with_unthrottled_bw("app1"), Some(3));
+        assert_eq!(scheduler.get_time_with_unthrottled_bw("app2"), None);
     }
 }

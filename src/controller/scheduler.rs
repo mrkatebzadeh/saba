@@ -190,6 +190,13 @@ impl Scheduler {
         }
         Some(slowdown)
     }
+
+    #[allow(dead_code)]
+    pub fn generate_slowdown_table(&mut self) {
+        for app in self.profile_table.keys() {
+            self.slowdown_table.insert(app.clone(), self.get_slowdown(app).unwrap());
+        }
+    }
 }
 
 #[cfg(test)]
@@ -319,5 +326,18 @@ mod tests {
         let scheduler = Scheduler::new(AllocationAlgorithm::InfiniBand, 3, profile_table);
         assert_eq!(scheduler.get_slowdown("app1"), Some(vec![0.33, 0.5, 1.0]));
         assert_eq!(scheduler.get_slowdown("app2"), None);
+    }
+
+    #[test]
+    fn test_generate_slowdown_table() {
+        let filename = "tests/profile.csv";
+        let profile_table = Scheduler::read_profile_table_from_file(filename).unwrap();
+        let mut scheduler = Scheduler::new(AllocationAlgorithm::InfiniBand, 3, profile_table);
+        scheduler.generate_slowdown_table();
+        assert_eq!(scheduler.slowdown_table.len(), 1);
+        assert_eq!(scheduler.slowdown_table["app1"].len(), 3);
+        assert_eq!(scheduler.slowdown_table["app1"][0], 0.33);
+        assert_eq!(scheduler.slowdown_table["app1"][1], 0.5);
+        assert_eq!(scheduler.slowdown_table["app1"][2], 1.0);
     }
 }

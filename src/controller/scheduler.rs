@@ -152,12 +152,18 @@ impl Scheduler {
     }
 
     #[allow(dead_code)]
-    pub fn read_profile_table_from_file(filename: &str) -> Result<Vec<ProfileRecord>, String> {
-        let mut profile_table = Vec::new();
+    pub fn read_profile_table_from_file(
+        filename: &str,
+    ) -> Result<HashMap<String, Vec<ProfileRecord>>, String> {
+        let mut profile_table: HashMap<String, Vec<ProfileRecord>> = HashMap::new();
         let mut reader = csv::Reader::from_path(filename).map_err(|e| e.to_string())?;
         for result in reader.deserialize() {
             let record: ProfileRecord = result.map_err(|e| e.to_string())?;
-            profile_table.push(record);
+            if profile_table.contains_key(record.name()) {
+                profile_table.get_mut(record.name()).unwrap().push(record);
+            } else {
+                profile_table.insert(record.name().clone(), vec![record]);
+            }
         }
         Ok(profile_table)
     }
@@ -171,6 +177,18 @@ impl Scheduler {
             }
         }
         None
+    }
+
+    #[allow(dead_code)]
+    fn get_slowdown(&self, app: &str) -> Option<Vec<f32>> {
+        let profile_table = self.profile_table.get(app)?;
+        let mut slowdown = Vec::new();
+        for record in profile_table {
+            let time_with_unthrottled_bw = self.get_time_with_unthrottled_bw(app)?;
+            let slowdown_value = time_with_unthrottled_bw as f32 / record.time() as f32;
+            slowdown.push((100.0 * slowdown_value).round() / 100.0);
+        }
+        Some(slowdown)
     }
 }
 
@@ -258,33 +276,48 @@ mod tests {
     fn test_read_profile_table_from_file() {
         let filename = "tests/profile.csv";
         let profile_table = Scheduler::read_profile_table_from_file(filename).unwrap();
-        assert_eq!(profile_table.len(), 3);
-        assert_eq!(profile_table[0].name(), "app1");
-        assert_eq!(*profile_table[0].bw(), BandwidthValuePercent::Ten);
-        assert_eq!(profile_table[0].time(), 1);
-        assert_eq!(profile_table[0].dataset_size(), 1);
-        assert_eq!(profile_table[0].number_of_nodes(), 1);
+        assert_eq!(profile_table.len(), 1);
+        assert_eq!(profile_table["app1"].len(), 3);
+        assert_eq!(profile_table["app1"][0].name(), "app1");
+        assert_eq!(*profile_table["app1"][0].bw(), BandwidthValuePercent::Ten);
+        assert_eq!(profile_table["app1"][0].time(), 3);
+        assert_eq!(profile_table["app1"][0].dataset_size(), 1);
+        assert_eq!(profile_table["app1"][0].number_of_nodes(), 1);
 
-        assert_eq!(profile_table[1].name(), "app1");
-        assert_eq!(*profile_table[1].bw(), BandwidthValuePercent::TwentyFive);
-        assert_eq!(profile_table[1].time(), 2);
-        assert_eq!(profile_table[1].dataset_size(), 1);
-        assert_eq!(profile_table[1].number_of_nodes(), 1);
+        assert_eq!(profile_table["app1"][1].name(), "app1");
+        assert_eq!(
+            *profile_table["app1"][1].bw(),
+            BandwidthValuePercent::TwentyFive
+        );
+        assert_eq!(profile_table["app1"][1].time(), 2);
+        assert_eq!(profile_table["app1"][1].dataset_size(), 1);
+        assert_eq!(profile_table["app1"][1].number_of_nodes(), 1);
+
+        assert_eq!(profile_table["app1"][2].name(), "app1");
+        assert_eq!(
+            *profile_table["app1"][2].bw(),
+            BandwidthValuePercent::Hundred
+        );
+        assert_eq!(profile_table["app1"][2].time(), 1);
+        assert_eq!(profile_table["app1"][2].dataset_size(), 1);
+        assert_eq!(profile_table["app1"][2].number_of_nodes(), 1);
     }
 
     #[test]
     fn test_get_time_with_unthrottled_bw() {
         let filename = "tests/profile.csv";
         let profile_table = Scheduler::read_profile_table_from_file(filename).unwrap();
-        let scheduler = Scheduler::new(
-            AllocationAlgorithm::InfiniBand,
-            3,
-            profile_table
-                .iter()
-                .map(|record| (record.name().to_string(), vec![record.clone()]))
-                .collect(),
-        );
-        assert_eq!(scheduler.get_time_with_unthrottled_bw("app1"), Some(3));
+        let scheduler = Scheduler::new(AllocationAlgorithm::InfiniBand, 3, profile_table);
+        assert_eq!(scheduler.get_time_with_unthrottled_bw("app1"), Some(1));
         assert_eq!(scheduler.get_time_with_unthrottled_bw("app2"), None);
+    }
+
+    #[test]
+    fn test_get_slowdown() {
+        let filename = "tests/profile.csv";
+        let profile_table = Scheduler::read_profile_table_from_file(filename).unwrap();
+        let scheduler = Scheduler::new(AllocationAlgorithm::InfiniBand, 3, profile_table);
+        assert_eq!(scheduler.get_slowdown("app1"), Some(vec![0.33, 0.5, 1.0]));
+        assert_eq!(scheduler.get_slowdown("app2"), None);
     }
 }

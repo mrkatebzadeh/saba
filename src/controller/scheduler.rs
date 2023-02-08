@@ -194,7 +194,8 @@ impl Scheduler {
     #[allow(dead_code)]
     pub fn generate_slowdown_table(&mut self) {
         for app in self.profile_table.keys() {
-            self.slowdown_table.insert(app.clone(), self.get_slowdown(app).unwrap());
+            self.slowdown_table
+                .insert(app.clone(), self.get_slowdown(app).unwrap());
         }
     }
 }

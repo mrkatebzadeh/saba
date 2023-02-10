@@ -3,12 +3,12 @@ mod register;
 mod config;
 use std::thread;
 
-use config::{get_config, Commands};
+use crate::config::{Config,Commands};
 use log::{debug, info};
 
 #[tokio::main]
 async fn main() {
-    let config = get_config();
+    let config = Config::new();
 
     simplelog::CombinedLogger::init(vec![
         simplelog::TermLogger::new(
@@ -25,7 +25,7 @@ async fn main() {
         simplelog::WriteLogger::new(
             simplelog::LevelFilter::Info,
             simplelog::Config::default(),
-            std::fs::File::create("connection_manager.log").unwrap(),
+            std::fs::File::create("interface.log").unwrap(),
         ),
     ])
     .unwrap();

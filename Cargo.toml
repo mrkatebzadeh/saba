@@ -11,8 +11,8 @@ name = "controller"
 path = "src/controller/main.rs"
 
 [[bin]]
-name = "connection_manager"
-path = "src/connection_manager/main.rs"
+name = "interface"
+path = "src/interface/main.rs"
 
 
 [dependencies]

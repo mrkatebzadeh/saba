@@ -1,0 +1,15 @@
+syntax = "proto3";
+package register;
+
+service Register {
+    rpc Register (RegisterRequest) returns (RegisterResponse);
+}
+
+message RegisterRequest {
+  string name = 1;
+}
+
+message RegisterResponse {
+    int32 priority = 1;
+}
+

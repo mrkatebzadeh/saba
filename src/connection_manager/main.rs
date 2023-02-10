@@ -1,4 +1,5 @@
 mod client;
+mod register;
 mod config;
 use std::thread;
 
@@ -32,11 +33,22 @@ async fn main() {
     match config.command {
         Commands::Start => {
             info!("Starting connection manager...");
-            thread::spawn(move || {
-                client::connect(config.ip, config.port).unwrap();
+            let ip = config.ip.clone();
+            let port = config.port;
+            let ip2 = config.ip.clone();
+            let port2 = config.port;
+            thread::spawn(move|| {
+                client::connect(ip, port).unwrap();
             })
             .join()
             .expect("Unable to start client");
+
+            info!("Registering...");
+            thread::spawn(move|| {
+                register::register(ip2, port2).unwrap();
+            })
+            .join()
+            .expect("Unable to register client");
         }
         Commands::Stop => {
             info!("Stopping...");

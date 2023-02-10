@@ -1,7 +1,9 @@
 use crate::connection::Connection;
 use crate::profile::BandwidthValuePercent;
 use crate::profile::ProfileRecord;
+use itertools::Itertools;
 use std::collections::HashMap;
+extern crate kodama;
 
 #[derive(Debug, PartialEq, Eq, Hash, Clone)]
 pub enum AllocationAlgorithm {
@@ -196,6 +198,15 @@ impl Scheduler {
         for app in self.profile_table.keys() {
             self.slowdown_table
                 .insert(app.clone(), self.get_slowdown(app).unwrap());
+        }
+    }
+
+    #[allow(dead_code)]
+    pub fn cluster_applications(&self) {
+        let mut table: Vec<Vec<f32>> = Vec::new();
+        for app in self.slowdown_table.iter().sorted_by(|a, b| a.0.cmp(b.0)) {
+            let row: Vec<f32> = app.1.clone();
+            table.push(row);
         }
     }
 }

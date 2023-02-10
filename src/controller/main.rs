@@ -6,13 +6,15 @@ mod scheduler;
 mod server;
 mod topology;
 
-use config::{get_config, Commands};
+use crate::config::{Config,Commands};
 use log::{debug, info};
 use std::thread;
+use std::fs;
 
 #[tokio::main]
 async fn main() {
-    let config = get_config();
+    let config = Config::new("topology");
+    fs::create_dir_all("./logs").expect("Unable to create logs directory");
 
     simplelog::CombinedLogger::init(vec![
         simplelog::TermLogger::new(
@@ -29,7 +31,7 @@ async fn main() {
         simplelog::WriteLogger::new(
             simplelog::LevelFilter::Info,
             simplelog::Config::default(),
-            std::fs::File::create("controller.log").unwrap(),
+            std::fs::File::create("logs/controller.log").unwrap(),
         ),
     ])
     .unwrap();

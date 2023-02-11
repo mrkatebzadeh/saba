@@ -1,7 +1,5 @@
 use register::{register_client::RegisterClient, RegisterRequest};
-use local_ip_address::local_ip;
 use log::debug;
-use std::io::stdin;
 
 
 pub mod register {

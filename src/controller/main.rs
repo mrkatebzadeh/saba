@@ -4,17 +4,23 @@ mod node;
 mod profile;
 mod scheduler;
 mod server;
+mod signal;
 mod topology;
 
-use crate::config::{Config,Commands};
-use log::{debug, info};
+use crate::config::{Commands, Config};
+use log::{debug, error, info};
+extern crate daemonize;
+use daemonize::Daemonize;
+use std::fs::File;
 use std::thread;
-use std::fs;
+use std::process;
 
-#[tokio::main]
-async fn main() {
-    let config = Config::new("topology");
-    fs::create_dir_all("./logs").expect("Unable to create logs directory");
+fn main() -> std::io::Result<()> {
+    let stdout = File::create("/tmp/saba_controller.out").unwrap();
+    let stderr = File::create("/tmp/saba_controller.err").unwrap();
+    let pid = "/tmp/saba_controller.pid";
+
+    let config = Config::new("/tmp/topology");
 
     simplelog::CombinedLogger::init(vec![
         simplelog::TermLogger::new(
@@ -29,29 +35,41 @@ async fn main() {
             simplelog::ColorChoice::Auto,
         ),
         simplelog::WriteLogger::new(
-            simplelog::LevelFilter::Info,
+            simplelog::LevelFilter::Trace,
             simplelog::Config::default(),
-            std::fs::File::create("logs/controller.log").unwrap(),
+            stderr,
         ),
     ])
     .unwrap();
     debug!("Config: {:?}", config);
 
-    match config.command {
-        Commands::Start => {
-            info!("Starting controller...");
+    let daemonize = Daemonize::new()
+        .pid_file(pid) // Every method except `new` and `start`
+        .chown_pid_file(true) // is optional, see `Daemonize` documentation
+        .working_directory("/tmp") // for default behaviour.
+        .user("root")
+        .group("daemon")
+        .group(2)
+        .umask(0o777)
+        .stdout(stdout)
+        // .stderr(stderr)
+        .privileged_action(|| "Executed before drop privileges");
+
+    match daemonize.start() {
+        Ok(_) => {
+            let signal_handler = thread::spawn(move || {
+                signal::register_exit_signal(pid).unwrap();
+            });
+
+            info!("Saba started");
+
             thread::spawn(move || {
                 server::serve(config.ip, config.port).unwrap();
-            })
-            .join()
-            .expect("Unable to start server");
+            });
+            signal_handler.join().unwrap();
+            process::exit(1);
         }
-        Commands::Stop => {
-            info!("Stopping...");
-        }
-        Commands::Status => {
-            info!("Status...");
-        }
-        Commands::Nop => {}
+        Err(e) => error!("Failed to daemonize, {}", e),
     }
+    Ok(())
 }

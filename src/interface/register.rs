@@ -1,5 +1,5 @@
 use register::{register_client::RegisterClient, RegisterRequest};
-use log::debug;
+use log::info;
 
 
 pub mod register {
@@ -9,7 +9,7 @@ pub mod register {
 #[tokio::main]
 pub async fn register(ip: String, port: u16) -> Result<(), Box<dyn std::error::Error>> {
     let addr: String = format!("http://{ip}:{port}").parse()?;
-    debug!("Registering to {}", addr);
+    info!("Registering to {}", addr);
     let mut client = RegisterClient::connect(addr).await?;
 
     let name = "Application";
@@ -17,7 +17,7 @@ pub async fn register(ip: String, port: u16) -> Result<(), Box<dyn std::error::E
         name: String::from(name),
     });
     let response = client.register(request).await?;
-    println!("Priority: {}", response.into_inner().priority);
+    info!("Priority: {}", response.into_inner().priority);
     Ok(())
 }
 

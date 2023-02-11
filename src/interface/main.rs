@@ -1,13 +1,21 @@
 mod client;
-mod register;
 mod config;
+mod register;
+mod signal;
 use std::thread;
 
-use crate::config::{Config,Commands};
-use log::{debug, info};
+use crate::config::Config;
+use log::{debug, error, info};
+extern crate daemonize;
+use daemonize::Daemonize;
+use std::fs::File;
+use std::process;
 
-#[tokio::main]
-async fn main() {
+fn main() -> std::io::Result<()> {
+    let stdout = File::create("/tmp/saba_interface.out").unwrap();
+    let stderr = File::create("/tmp/saba_interface.err").unwrap();
+    let pid = "/tmp/saba_interface.pid";
+
     let config = Config::new();
 
     simplelog::CombinedLogger::init(vec![
@@ -25,37 +33,51 @@ async fn main() {
         simplelog::WriteLogger::new(
             simplelog::LevelFilter::Info,
             simplelog::Config::default(),
-            std::fs::File::create("interface.log").unwrap(),
+            stderr,
         ),
     ])
     .unwrap();
     debug!("Config: {:?}", config);
-    match config.command {
-        Commands::Start => {
-            info!("Starting connection manager...");
-            let ip = config.ip.clone();
-            let port = config.port;
-            let ip2 = config.ip.clone();
-            let port2 = config.port;
-            thread::spawn(move|| {
-                client::connect(ip, port).unwrap();
-            })
-            .join()
-            .expect("Unable to start client");
 
-            info!("Registering...");
-            thread::spawn(move|| {
-                register::register(ip2, port2).unwrap();
-            })
-            .join()
-            .expect("Unable to register client");
+    let daemonize = Daemonize::new()
+        .pid_file(pid) // Every method except `new` and `start`
+        .chown_pid_file(true) // is optional, see `Daemonize` documentation
+        .working_directory("/tmp") // for default behaviour.
+        .user("root")
+        .group("daemon")
+        .group(2)
+        .umask(0o777)
+        .stdout(stdout)
+        // .stderr(stderr)
+        .privileged_action(|| "Executed before drop privileges");
+
+    match daemonize.start() {
+        Ok(_) => {
+            let signal_handler = thread::spawn(move || {
+                signal::register_exit_signal(pid).unwrap();
+            });
+
+            info!("Saba started");
+
+            {
+                let ip = config.ip.clone();
+                let port = config.port;
+                thread::spawn(move || {
+                    client::connect(ip, port).unwrap();
+                });
+            }
+            {
+                let ip = config.ip.clone();
+                let port = config.port;
+                info!("Registering...");
+                thread::spawn(move || {
+                    register::register(ip, port).unwrap();
+                });
+            }
+            signal_handler.join().unwrap();
+            process::exit(1);
         }
-        Commands::Stop => {
-            info!("Stopping...");
-        }
-        Commands::Status => {
-            info!("Status...");
-        }
-        Commands::Nop => {}
+        Err(e) => error!("Failed to daemonize, {}", e),
     }
+    Ok(())
 }

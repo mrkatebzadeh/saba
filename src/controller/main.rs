@@ -7,7 +7,7 @@ mod server;
 mod signal;
 mod topology;
 
-use crate::config::{Commands, Config};
+use crate::config::Config;
 use log::{debug, error, info};
 extern crate daemonize;
 use daemonize::Daemonize;
@@ -35,7 +35,7 @@ fn main() -> std::io::Result<()> {
             simplelog::ColorChoice::Auto,
         ),
         simplelog::WriteLogger::new(
-            simplelog::LevelFilter::Trace,
+            simplelog::LevelFilter::Info,
             simplelog::Config::default(),
             stderr,
         ),

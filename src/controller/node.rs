@@ -1,14 +1,14 @@
 use std::fmt::Debug;
 
 pub trait NetworkNode {
-    fn get_name(&self) -> String;
-    fn get_ip(&self) -> String;
-    fn get_weights(&self) -> Vec<u16>;
+    fn name(&self) -> String;
+    fn ip(&self) -> String;
+    fn weights(&self) -> Vec<u16>;
 }
 
 impl Debug for dyn NetworkNode {
     fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
-        write!(f, "NetworkNode{{{}}}", self.get_name())
+        write!(f, "NetworkNode{{{}}}", self.name())
     }
 }
 
@@ -29,15 +29,15 @@ impl Server {
 }
 
 impl NetworkNode for Server {
-    fn get_name(&self) -> String {
+    fn name(&self) -> String {
         self.name.clone()
     }
 
-    fn get_ip(&self) -> String {
+    fn ip(&self) -> String {
         self.ip.clone()
     }
 
-    fn get_weights(&self) -> Vec<u16> {
+    fn weights(&self) -> Vec<u16> {
         self.weights.clone()
     }
 }
@@ -64,15 +64,15 @@ impl Switch {
     }
 }
 impl NetworkNode for Switch {
-    fn get_name(&self) -> String {
+    fn name(&self) -> String {
         self.name.clone()
     }
 
-    fn get_ip(&self) -> String {
+    fn ip(&self) -> String {
         self.ip.clone()
     }
 
-    fn get_weights(&self) -> Vec<u16> {
+    fn weights(&self) -> Vec<u16> {
         self.weights.clone()
     }
 }
@@ -84,16 +84,16 @@ mod tests {
     #[test]
     fn test_server() {
         let server = Server::new("server1", "127.0.0.1", vec![1, 2, 3]);
-        assert_eq!(server.get_name(), "server1");
-        assert_eq!(server.get_ip(), "127.0.0.1");
-        assert_eq!(server.get_weights(), vec![1, 2, 3]);
+        assert_eq!(server.name(), "server1");
+        assert_eq!(server.ip(), "127.0.0.1");
+        assert_eq!(server.weights(), vec![1, 2, 3]);
     }
 
     #[test]
     fn test_switch() {
         let switch = Switch::new("switch1", "127.0.0.1", 4, vec![1, 2, 3]);
-        assert_eq!(switch.get_name(), "switch1");
-        assert_eq!(switch.get_ip(), "127.0.0.1");
-        assert_eq!(switch.get_weights(), vec![1, 2, 3]);
+        assert_eq!(switch.name(), "switch1");
+        assert_eq!(switch.ip(), "127.0.0.1");
+        assert_eq!(switch.weights(), vec![1, 2, 3]);
     }
 }

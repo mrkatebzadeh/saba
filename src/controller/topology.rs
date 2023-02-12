@@ -24,12 +24,12 @@ impl Topology {
             let top = queue.pop_front().unwrap();
             let (current, path) = (&self.nodes[top.0], top.1);
 
-            if current.get_name() == end {
+            if current.name() == end {
                 debug!("Found path: {:?}", path);
                 return Some(path);
             }
 
-            if let Some(adjacent) = self.adjacency.get(&current.get_name()) {
+            if let Some(adjacent) = self.adjacency.get(&current.name()) {
                 for node in adjacent {
                     if !visited.contains_key(node as &str) {
                         visited.insert(node, true);
@@ -45,14 +45,14 @@ impl Topology {
 
     #[allow(dead_code)]
     fn add_server(&mut self, new_server: Server, adjacent: Vec<String>) {
-        let name = new_server.get_name();
+        let name = new_server.name();
         self.nodes.insert(name.clone(), Box::new(new_server));
         self.adjacency.insert(name, adjacent);
     }
 
     #[allow(dead_code)]
     fn add_switch(&mut self, new_switch: Switch, adjacent: Vec<String>) {
-        let name = new_switch.get_name();
+        let name = new_switch.name();
         self.nodes.insert(name.clone(), Box::new(new_switch));
         self.adjacency.insert(name, adjacent);
     }

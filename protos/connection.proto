@@ -1,0 +1,19 @@
+syntax = "proto3";
+package connection;
+
+service Connection {
+    rpc Connection (ConnectionRequest) returns (ConnectionResponse);
+}
+
+message ConnectionRequest {
+  string app = 1;
+  string src = 2;
+  string dst = 3;
+  string action = 4;
+}
+
+message ConnectionResponse {
+    int32 res = 1;
+}
+
+

@@ -1,6 +1,5 @@
-mod client;
 mod config;
-mod register;
+mod actions;
 mod signal;
 use std::thread;
 
@@ -63,7 +62,7 @@ fn main() -> std::io::Result<()> {
                 let ip = config.ip.clone();
                 let port = config.port;
                 thread::spawn(move || {
-                    client::connect(ip, port).unwrap();
+                    actions::init(ip, port).unwrap();
                 });
             }
             {
@@ -71,7 +70,7 @@ fn main() -> std::io::Result<()> {
                 let port = config.port;
                 info!("Registering...");
                 thread::spawn(move || {
-                    register::register(ip, port).unwrap();
+                    actions::register("App1", ip, port, "register").unwrap();
                 });
             }
             signal_handler.join().unwrap();

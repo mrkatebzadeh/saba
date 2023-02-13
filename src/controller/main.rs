@@ -64,7 +64,7 @@ fn main() -> std::io::Result<()> {
             info!("Saba started");
 
             thread::spawn(move || {
-                server::serve(config.ip, config.port).unwrap();
+                server::serve(&config.ip[..], config.port).unwrap();
             });
             signal_handler.join().unwrap();
             process::exit(1);

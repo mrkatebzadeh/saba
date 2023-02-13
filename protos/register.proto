@@ -7,6 +7,7 @@ service Register {
 
 message RegisterRequest {
   string name = 1;
+  string action = 2;
 }
 
 message RegisterResponse {

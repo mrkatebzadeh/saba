@@ -1,3 +1,4 @@
+use crate::model::Model;
 use crate::profile::ProfileRecord;
 use log::debug;
 use std::{collections::HashMap, fmt::Debug};
@@ -7,20 +8,20 @@ pub trait Allocator: Debug {
 }
 
 #[derive(Debug)]
-pub struct SabaAllocator {
+pub struct SabaAllocator<Sensitivity: Model> {
     profile_table: HashMap<String, Vec<ProfileRecord>>,
     slowdown_table: HashMap<String, Vec<f32>>,
-    sensitivity_table: HashMap<String, f32>,
+    sensitivity_table: HashMap<String, Box<dyn Model<Other = Sensitivity>>>,
 }
 
-impl Allocator for SabaAllocator {
+impl<Sensitivity: Model> Allocator for SabaAllocator<Sensitivity> {
     fn allocate(&mut self) {
         debug!("Allocating with Saba..");
         unimplemented!()
     }
 }
 
-impl SabaAllocator {
+impl<Sensitivity: Model> SabaAllocator<Sensitivity> {
     pub fn new() -> Self {
         SabaAllocator {
             profile_table: HashMap::new(),
@@ -30,7 +31,7 @@ impl SabaAllocator {
     }
 }
 
-impl SabaAllocator {
+impl<Sensitivity: Model> SabaAllocator<Sensitivity> {
     #[allow(dead_code)]
     fn get_time_with_unthrottled_bw(&self, app: &str) -> Option<u16> {
         let profile_table = self.profile_table.get(app)?;
@@ -60,19 +61,25 @@ impl SabaAllocator {
     }
 
     #[allow(dead_code)]
-    fn generate_slowdown_table(&mut self) {
+    fn fill_slowdown_table(&mut self) {
         for app in self.profile_table.keys() {
-            self.slowdown_table
-                .insert(app.clone(), self.get_slowdown(app).unwrap());
+            let values: Vec<u16> = self.profile_table[app].iter().map(|r| r.time()).collect();
+            let min_value = values.iter().min().unwrap();
+            let mut slowdowns = Vec::new();
+
+            for value in values.iter() {
+                slowdowns.push(*value as f32 / *min_value as f32);
+            }
+            self.slowdown_table.insert(app.clone(), slowdowns);
         }
     }
 
     #[allow(dead_code)]
     fn cluster_applications(&self) {
-        let mut table: Vec<Vec<f32>> = Vec::new();
-        for app in self.slowdown_table.iter().sorted_by(|a, b| a.0.cmp(b.0)) {
-            let row: Vec<f32> = app.1.clone();
-            table.push(row);
+        let mut table: Vec<&Box<dyn Model<Other = Sensitivity>>> = Vec::new();
+        for app in self.sensitivity_table.iter() {
+            let model = app.1;
+            table.push(model);
         }
     }
 }

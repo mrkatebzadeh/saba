@@ -1,13 +1,15 @@
 use crate::profile::ProfileRecord;
+use std::fmt::Debug;
 
-trait Model {
+pub trait Model: Debug {
     type Other;
     fn slowdown(&self, bw: f32) -> f32;
     fn distance(&self, other: &Self::Other) -> f32;
-    fn fit(&self, records: &Vec<ProfileRecord>);
+    fn fit(&mut self, records: &Vec<f32>);
 }
 
-struct SensitivityCurve {
+#[derive(Debug)]
+pub struct SensitivityCurve {
     pub coefficients: Vec<f32>,
 }
 
@@ -29,18 +31,13 @@ impl Model for SensitivityCurve {
         distance.sqrt()
     }
 
-    fn fit(&self, records: &Vec<ProfileRecord>) {
-        let mut values: Vec<u16> = records.iter().map(|r| r.time()).collect();
-        let min_value = values.iter().min().unwrap();
-
-        for value in values.iter_mut() {
-            *value = *value / min_value;
-        }
+    fn fit(&mut self, records: &Vec<f32>) {
         unimplemented!()
     }
 }
 
-struct SensitivityScore {
+#[derive(Debug)]
+pub struct SensitivityScore {
     pub score: f32,
 }
 
@@ -55,15 +52,8 @@ impl Model for SensitivityScore {
         (self.score - other.score).abs()
     }
 
-    fn fit(&self, records: &Vec<ProfileRecord>) {
-        let mut values: Vec<u16> = records.iter().map(|r| r.time()).collect();
-        let min_value = values.iter().min().unwrap();
-
-        for value in values.iter_mut() {
-            *value = *value / min_value;
-        }
-
-        let score = values.iter().sum::<u16>() as f32 / values.len() as f32;
+    fn fit(&mut self, records: &Vec<f32>) {
+        let score = 0.0;
         self.score = score;
     }
 }

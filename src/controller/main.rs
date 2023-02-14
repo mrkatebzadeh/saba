@@ -1,5 +1,8 @@
+mod allocator;
 mod config;
 mod connection;
+mod enforcer;
+mod model;
 mod node;
 mod profile;
 mod scheduler;

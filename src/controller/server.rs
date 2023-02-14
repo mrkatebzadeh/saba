@@ -1,7 +1,6 @@
 use log::info;
 use tonic::{transport::Server, Request, Response, Status};
 
-
 // ----------------------------------------------
 // Init
 // ----------------------------------------------
@@ -48,9 +47,7 @@ impl Register for MyRegister {
         request: Request<RegisterRequest>,
     ) -> Result<Response<RegisterResponse>, Status> {
         info!("Got a request: {request:?}");
-        let reply = register::RegisterResponse {
-            priority: 1,
-        };
+        let reply = register::RegisterResponse { priority: 1 };
         Ok(Response::new(reply))
     }
 }
@@ -76,9 +73,7 @@ impl Connection for MyConnection {
         request: Request<ConnectionRequest>,
     ) -> Result<Response<ConnectionResponse>, Status> {
         info!("Got a request: {request:?}");
-        let reply = connection::ConnectionResponse {
-            res: 0,
-        };
+        let reply = connection::ConnectionResponse { res: 0 };
         Ok(Response::new(reply))
     }
 }

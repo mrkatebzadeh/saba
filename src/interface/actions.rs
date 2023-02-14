@@ -26,7 +26,6 @@ pub async fn init(ip: String, port: u16) -> Result<(), Box<dyn std::error::Error
 
 use register::{register_client::RegisterClient, RegisterRequest};
 
-
 // ----------------------------------------------
 // Register
 // ----------------------------------------------
@@ -36,7 +35,12 @@ pub mod register {
 }
 
 #[tokio::main]
-pub async fn register(app: &str, ip: String, port: u16, action: &str) -> Result<(), Box<dyn std::error::Error>> {
+pub async fn register(
+    app: &str,
+    ip: String,
+    port: u16,
+    action: &str,
+) -> Result<(), Box<dyn std::error::Error>> {
     let addr: String = format!("http://{ip}:{port}").parse()?;
     info!("Registering to {}", addr);
     let mut client = RegisterClient::connect(addr).await?;
@@ -50,5 +54,3 @@ pub async fn register(app: &str, ip: String, port: u16, action: &str) -> Result<
     info!("Priority: {}", response.into_inner().priority);
     Ok(())
 }
-
-

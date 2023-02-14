@@ -12,8 +12,8 @@ use log::{debug, error, info};
 extern crate daemonize;
 use daemonize::Daemonize;
 use std::fs::File;
-use std::thread;
 use std::process;
+use std::thread;
 
 fn main() -> std::io::Result<()> {
     let stdout = File::create("/tmp/saba_controller.out").unwrap();
@@ -47,10 +47,6 @@ fn main() -> std::io::Result<()> {
         .pid_file(pid) // Every method except `new` and `start`
         .chown_pid_file(true) // is optional, see `Daemonize` documentation
         .working_directory("/tmp") // for default behaviour.
-        .user("root")
-        .group("daemon")
-        .group(2)
-        .umask(0o777)
         .stdout(stdout)
         // .stderr(stderr)
         .privileged_action(|| "Executed before drop privileges");

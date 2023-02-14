@@ -1,6 +1,6 @@
-use tokio::signal::unix::{signal, SignalKind};
 use log::info;
 use std::fs;
+use tokio::signal::unix::{signal, SignalKind};
 
 #[tokio::main]
 pub async fn register_exit_signal(pid: &str) -> Result<(), Box<dyn std::error::Error>> {

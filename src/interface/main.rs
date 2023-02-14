@@ -1,5 +1,5 @@
-mod config;
 mod actions;
+mod config;
 mod signal;
 use std::thread;
 
@@ -42,10 +42,6 @@ fn main() -> std::io::Result<()> {
         .pid_file(pid) // Every method except `new` and `start`
         .chown_pid_file(true) // is optional, see `Daemonize` documentation
         .working_directory("/tmp") // for default behaviour.
-        .user("root")
-        .group("daemon")
-        .group(2)
-        .umask(0o777)
         .stdout(stdout)
         // .stderr(stderr)
         .privileged_action(|| "Executed before drop privileges");

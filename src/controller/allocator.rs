@@ -4,7 +4,6 @@
 //! - MaxMinAllocator
 //!
 
-
 use crate::model::Model;
 use crate::profile::ProfileRecord;
 use log::debug;
@@ -18,7 +17,7 @@ pub trait Allocator: Debug {
 /// SabaAllocator is an allocator that uses the Saba scheme.
 /// Saba is a bandwidth allocation scheme that uses a sensitivity model to
 /// predict the slowdown of an application when the bandwidth is reduced.
-/// The algorithm is described in the paper "Saba: Rethinking Datacenter Network 
+/// The algorithm is described in the paper "Saba: Rethinking Datacenter Network
 /// Allocation from Application’s Perspective" by M.R.S. Katebzadeh et al.
 /// The algorithm is implemented in the `allocate` method.
 /// The allocator uses the following tables:
@@ -72,9 +71,7 @@ impl<Sensitivity: Model> SabaAllocator<Sensitivity> {
 
     /// Reads the profile table from a CSV file.
     #[allow(dead_code)]
-    fn read_from_file(
-        filename: &str,
-    ) -> Result<HashMap<String, Vec<ProfileRecord>>, String> {
+    fn read_from_file(filename: &str) -> Result<HashMap<String, Vec<ProfileRecord>>, String> {
         let mut profile_table: HashMap<String, Vec<ProfileRecord>> = HashMap::new();
         let mut reader = csv::Reader::from_path(filename).map_err(|e| e.to_string())?;
         for result in reader.deserialize() {

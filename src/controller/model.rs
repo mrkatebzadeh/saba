@@ -1,4 +1,3 @@
-use crate::profile::ProfileRecord;
 use std::fmt::Debug;
 
 pub trait Model: Debug {

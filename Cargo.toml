@@ -6,6 +6,10 @@ description = "Saba Bandwidth Allocation Scheme"
 repository = "https://github.com/mrkatebzadeh/saba-controller"
 license = "MIT"
 
+[[lib]]
+name = "saba"
+path = "src/lib.rs"
+
 [[bin]]
 name = "controller"
 path = "src/controller/main.rs"
@@ -13,6 +17,10 @@ path = "src/controller/main.rs"
 [[bin]]
 name = "interface"
 path = "src/interface/main.rs"
+
+[[bin]]
+name = "profiler"
+path = "src/profiler/main.rs"
 
 
 [dependencies]

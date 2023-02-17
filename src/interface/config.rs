@@ -8,7 +8,7 @@ use std::path::PathBuf;
 
 #[derive(Parser)]
 #[command(
-    about = "Connection manager of Saba bandwidth allocation scheme",
+    about = "Interface of Saba bandwidth allocation scheme",
     version = "0.1.0",
     author = "M.R. Siavash Katebzadeh"
 )]
@@ -39,11 +39,11 @@ pub enum Commands {
 
 #[derive(Debug, Deserialize)]
 struct TomlConfig {
-    controller: Option<ControllerConfig>,
+    interface: Option<InterfaceConfig>,
 }
 
 #[derive(Debug, Deserialize)]
-struct ControllerConfig {
+struct InterfaceConfig {
     ip: Option<String>,
     port: Option<u16>,
 }
@@ -73,11 +73,11 @@ impl Config {
                 std::fs::read_to_string(config_path).expect("Unable to read config file.");
             let toml_config: TomlConfig =
                 toml::from_str(&toml_config_str).expect("Unable to parse config file.");
-            if let Some(controller_config) = toml_config.controller {
-                if let Some(ip) = controller_config.ip {
+            if let Some(interface_config) = toml_config.interface {
+                if let Some(ip) = interface_config.ip {
                     config.ip = ip;
                 }
-                if let Some(port) = controller_config.port {
+                if let Some(port) = interface_config.port {
                     config.port = port;
                 }
             }

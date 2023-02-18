@@ -1,4 +1,5 @@
 mod config;
+mod profile;
 mod record;
 use log::debug;
 use std::fs::File;

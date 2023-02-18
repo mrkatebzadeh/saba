@@ -6,7 +6,7 @@ description = "Saba Bandwidth Allocation Scheme"
 repository = "https://github.com/mrkatebzadeh/saba-controller"
 license = "MIT"
 
-[[lib]]
+[lib]
 name = "saba"
 path = "src/lib.rs"
 

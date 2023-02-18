@@ -4,9 +4,11 @@
 //! - MaxMinAllocator
 //!
 
-use crate::model::Model;
 use crate::profile::ProfileRecord;
 use log::debug;
+use saba::model::Model;
+use std::collections::VecDeque;
+use std::sync::{Condvar, Mutex};
 use std::{collections::HashMap, fmt::Debug};
 
 /// Allocator is a trait that defines the interface for the allocator.
@@ -108,5 +110,47 @@ impl<Sensitivity: Model> SabaAllocator<Sensitivity> {
             let model = app.1;
             table.push(model);
         }
+    }
+}
+
+pub struct AllocationJob {
+    pub applications: Vec<String>,
+}
+
+pub struct AllocationQueue {
+    jobs: Mutex<Option<VecDeque<AllocationJob>>>,
+    cvar: Condvar,
+}
+
+impl AllocationQueue {
+    pub fn new() -> Self {
+        AllocationQueue {
+            jobs: Mutex::new(Some(VecDeque::new())),
+            cvar: Condvar::new(),
+        }
+    }
+}
+
+impl AllocationQueue {
+    pub fn allocate(&self, unallocated_applications: Vec<AllocationJob>) {
+        let mut jobs = self.jobs.lock().unwrap();
+        if let Some(queue) = jobs.as_mut() {
+            queue.extend(unallocated_applications);
+            self.cvar.notify_all();
+        }
+    }
+    pub fn wait_for_job(&self) -> Option<AllocationJob> {
+        let mut jobs = self.jobs.lock().unwrap();
+        loop {
+            match jobs.as_mut()?.pop_front() {
+                Some(job) => return Some(job),
+                None => jobs = self.cvar.wait(jobs).unwrap(),
+            }
+        }
+    }
+    pub fn end(&self) {
+        let mut jobs = self.jobs.lock().unwrap();
+        *jobs = None;
+        self.cvar.notify_all();
     }
 }

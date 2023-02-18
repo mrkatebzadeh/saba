@@ -2,15 +2,12 @@ mod allocator;
 mod config;
 mod connection;
 mod enforcer;
-mod model;
 mod node;
-mod profile;
 mod scheduler;
 mod server;
 mod signal;
 mod topology;
 
-use crate::config::Config;
 use log::{debug, error, info};
 extern crate daemonize;
 use daemonize::Daemonize;
@@ -23,7 +20,7 @@ fn main() -> std::io::Result<()> {
     let stderr = File::create("/tmp/saba_controller.err").unwrap();
     let pid = "/tmp/saba_controller.pid";
 
-    let config = Config::new("/tmp/topology");
+    let config = config::Config::new("/tmp/topology");
 
     simplelog::CombinedLogger::init(vec![
         simplelog::TermLogger::new(

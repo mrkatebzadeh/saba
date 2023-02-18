@@ -24,11 +24,11 @@ pub async fn init(ip: String, port: u16) -> Result<(), Box<dyn std::error::Error
     Ok(())
 }
 
-use register::{register_client::RegisterClient, RegisterRequest};
-
 // ----------------------------------------------
 // Register
 // ----------------------------------------------
+
+use register::{register_client::RegisterClient, RegisterRequest};
 
 pub mod register {
     tonic::include_proto!("register");
@@ -52,5 +52,40 @@ pub async fn register(
     });
     let response = client.register(request).await?;
     info!("Priority: {}", response.into_inner().priority);
+    Ok(())
+}
+
+// ----------------------------------------------
+// Connection
+// ----------------------------------------------
+
+use connection::{connection_client::ConnectionClient, ConnectionRequest};
+
+pub mod connection {
+    tonic::include_proto!("connection");
+}
+
+#[tokio::main]
+pub async fn connection(
+    app: &str,
+    ip: String,
+    port: u16,
+    src: &str,
+    dst: &str,
+    action: &str,
+) -> Result<(), Box<dyn std::error::Error>> {
+    let addr: String = format!("http://{ip}:{port}").parse()?;
+    info!("Registering connection to {}", addr);
+    let mut client = ConnectionClient::connect(addr).await?;
+
+    let name = app;
+    let request = tonic::Request::new(ConnectionRequest {
+        app: String::from(app),
+        src: String::from(src),
+        dst: String::from(dst),
+        action: String::from(action),
+    });
+    let response = client.connection(request).await?;
+    info!("Res: {}", response.into_inner().res);
     Ok(())
 }

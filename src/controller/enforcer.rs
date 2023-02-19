@@ -14,7 +14,6 @@ struct SabaEnforcer {
 
     priority_to_app_table: HashMap<u8, Vec<String>>,
     connection_to_app_table: HashMap<Connection, String>,
-    app_to_priority_table: HashMap<String, u8>,
 }
 
 impl Enforcer for SabaEnforcer {
@@ -32,11 +31,6 @@ impl SabaEnforcer {
     #[allow(dead_code)]
     fn connection_to_app(&self, connection: &Connection) -> Option<&String> {
         self.connection_to_app_table.get(connection)
-    }
-
-    #[allow(dead_code)]
-    fn app_to_priority(&self, app: &str) -> Option<&u8> {
-        self.app_to_priority_table.get(app)
     }
 }
 

@@ -34,6 +34,7 @@ pub trait Allocator: Debug {
 #[derive(Debug)]
 pub struct SabaAllocator<Sensitivity: Model> {
     sensitivity_table: HashMap<String, Box<dyn Model<Other = Sensitivity>>>,
+    allocation_queue: AllocationQueue,
 }
 
 /// Trait implementation for SabaAllocator.
@@ -49,21 +50,27 @@ impl<Sensitivity: Model> SabaAllocator<Sensitivity> {
     pub fn new() -> Self {
         SabaAllocator {
             sensitivity_table: HashMap::new(),
+            allocation_queue: AllocationQueue::new(),
         }
     }
 }
 
 impl<Sensitivity: Model> SabaAllocator<Sensitivity> {
-    fn get_performance(&self, app: &str, bw: u8) -> f32{
-        todo!()
+    fn get_performance(&self, app: &str, bw: f32) -> Option<f32> {
+        match self.sensitivity_table.get(app) {
+            Some(model) => Some(model.slowdown(bw)),
+            None => None,
+        }
     }
 }
 
+#[derive(Debug)]
 pub struct AllocationJob {
     pub applications: Vec<String>,
 }
 
-pub struct AllocationQueue {
+#[derive(Debug)]
+struct AllocationQueue {
     jobs: Mutex<Option<VecDeque<AllocationJob>>>,
     cvar: Condvar,
 }

@@ -1,3 +1,4 @@
+use crate::kmeans::*;
 use crate::record::Record;
 use saba::model::Model;
 use std::collections::VecDeque;
@@ -5,16 +6,18 @@ use std::sync::{Condvar, Mutex};
 use std::{collections::HashMap, fmt::Debug};
 
 #[derive(Debug)]
-pub struct Profiler<Sensitivity: Model> {
+pub struct Profiler {
+    priorities: u8,
     profile_table: HashMap<String, Vec<Record>>,
     slowdown_table: HashMap<String, Vec<f32>>,
-    sensitivity_table: HashMap<String, Box<dyn Model<Other = Sensitivity>>>,
+    sensitivity_table: HashMap<String, Model>,
 }
 
 /// Constructor for Profiler.
-impl<Sensitivity: Model> Profiler<Sensitivity> {
-    pub fn new() -> Self {
+impl Profiler {
+    pub fn new(priorities: u8) -> Self {
         Profiler {
+            priorities,
             profile_table: HashMap::new(),
             slowdown_table: HashMap::new(),
             sensitivity_table: HashMap::new(),
@@ -22,7 +25,7 @@ impl<Sensitivity: Model> Profiler<Sensitivity> {
     }
 }
 
-impl<Sensitivity: Model> Profiler<Sensitivity> {
+impl Profiler {
     /// Returns the completion time of an application with unthrottled bandwidth.
     #[allow(dead_code)]
     fn get_baseline_completion_time(&self, app: &str) -> Option<u16> {
@@ -69,11 +72,19 @@ impl<Sensitivity: Model> Profiler<Sensitivity> {
     /// Clusters the applications based on their sensitivity.
     #[allow(dead_code)]
     fn cluster_applications(&self) {
-        let mut table: Vec<&Box<dyn Model<Other = Sensitivity>>> = Vec::new();
+        let mut table: Vec<Model> = Vec::new();
         for app in self.sensitivity_table.iter() {
             let model = app.1;
-            table.push(model);
+            table.push(model.clone());
         }
+
+        // convert table to a matrix
+        let mut matrix: Vec<Vec<f32>> = Vec::new();
+
+        // let kmeans = KMeans::new(table, table.len(), 3);
+        // todo!(); // Parameterize the number of dimensions.
+
+        //
     }
 }
 

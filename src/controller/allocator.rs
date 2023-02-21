@@ -32,13 +32,13 @@ pub trait Allocator: Debug {
 ///  of the application with unthrottled bandwidth.
 ///
 #[derive(Debug)]
-pub struct SabaAllocator<Sensitivity: Model> {
-    sensitivity_table: HashMap<String, Box<dyn Model<Other = Sensitivity>>>,
+pub struct SabaAllocator {
+    sensitivity_table: HashMap<String, Model>,
     allocation_queue: AllocationQueue,
 }
 
 /// Trait implementation for SabaAllocator.
-impl<Sensitivity: Model> Allocator for SabaAllocator<Sensitivity> {
+impl SabaAllocator {
     fn allocate(&mut self) {
         debug!("Allocating with Saba..");
         unimplemented!()
@@ -46,7 +46,7 @@ impl<Sensitivity: Model> Allocator for SabaAllocator<Sensitivity> {
 }
 
 /// Constructor for SabaAllocator.
-impl<Sensitivity: Model> SabaAllocator<Sensitivity> {
+impl SabaAllocator {
     pub fn new() -> Self {
         SabaAllocator {
             sensitivity_table: HashMap::new(),
@@ -55,7 +55,7 @@ impl<Sensitivity: Model> SabaAllocator<Sensitivity> {
     }
 }
 
-impl<Sensitivity: Model> SabaAllocator<Sensitivity> {
+impl SabaAllocator {
     fn get_performance(&self, app: &str, bw: f32) -> Option<f32> {
         match self.sensitivity_table.get(app) {
             Some(model) => Some(model.slowdown(bw)),

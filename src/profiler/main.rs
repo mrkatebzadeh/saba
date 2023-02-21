@@ -1,7 +1,8 @@
 mod config;
+mod kmeans;
 mod profile;
 mod record;
-use log::debug;
+use log::{debug, info};
 use std::fs::File;
 
 fn main() -> std::io::Result<()> {
@@ -29,6 +30,8 @@ fn main() -> std::io::Result<()> {
     ])
     .unwrap();
     debug!("Config: {:?}", config);
+
+    info!("Saba profiler started");
 
     Ok(())
 }

@@ -77,15 +77,19 @@ mod tests {
     #[test]
     fn test_kmeans() {
         let curve1 = Model::SensitivityCurve(SensitivityCurve {
+            degree_of_polynomial: 1,
             coefficients: vec![1.0, 2.0, 3.0],
         });
         let curve2 = Model::SensitivityCurve(SensitivityCurve {
+            degree_of_polynomial: 1,
             coefficients: vec![2.0, 3.0, 4.0],
         });
         let curve3 = Model::SensitivityCurve(SensitivityCurve {
+            degree_of_polynomial: 1,
             coefficients: vec![30.0, 40.0, 50.0],
         });
         let curve4 = Model::SensitivityCurve(SensitivityCurve {
+            degree_of_polynomial: 1,
             coefficients: vec![40.0, 50.0, 60.0],
         });
         let curves = vec![curve1, curve2, curve3, curve4];

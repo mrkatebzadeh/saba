@@ -65,7 +65,7 @@ fn kmeans(curves: Vec<Model>, k: usize) -> Vec<Vec<Model>> {
 fn calculate_mean(cluster: &Vec<Model>) -> Model {
     let mut sum = cluster[0].clone();
     for curve in cluster.iter().skip(1) {
-        sum.add(curve); // Implement a method to add two models
+        sum = sum.add(curve); // Implement a method to add two models
     }
     let len = cluster.len() as f32;
     sum.divide(len) // Implement a method to divide a model by a scalar

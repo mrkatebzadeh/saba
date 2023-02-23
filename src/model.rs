@@ -1,5 +1,35 @@
 use nalgebra::{DMatrix, DVector};
-use std::{collections::HashMap, fmt::Debug};
+use std::{cmp::Ordering, error::Error, fmt};
+
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub enum ModelError {
+    NotEnoughSamples { needed: usize, provided: usize },
+    MissingBaselineSample,
+    InvalidBandwidth,
+    InvalidCompletionTime,
+    SingularMatrix,
+    EmptySamples,
+}
+
+impl fmt::Display for ModelError {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        match self {
+            ModelError::NotEnoughSamples { needed, provided } => {
+                write!(
+                    f,
+                    "not enough samples: needed {needed}, provided {provided}"
+                )
+            }
+            ModelError::MissingBaselineSample => write!(f, "missing baseline sample"),
+            ModelError::InvalidBandwidth => write!(f, "invalid bandwidth measurement"),
+            ModelError::InvalidCompletionTime => write!(f, "invalid completion time measurement"),
+            ModelError::SingularMatrix => write!(f, "failed to solve regression (singular matrix)"),
+            ModelError::EmptySamples => write!(f, "no samples provided"),
+        }
+    }
+}
+
+impl Error for ModelError {}
 
 #[derive(Debug, Clone)]
 pub enum Model {
@@ -29,10 +59,10 @@ impl Model {
         }
     }
 
-    pub fn fit(&mut self, records: &HashMap<u32, f32>) {
+    pub fn fit(&mut self, samples: &[(f32, f32)]) -> Result<(), ModelError> {
         match self {
-            Model::SensitivityCurve(curve) => curve.fit(records),
-            Model::SensitivityScore(score) => score.fit(records),
+            Model::SensitivityCurve(curve) => curve.fit(samples),
+            Model::SensitivityScore(score) => score.fit(samples),
         }
     }
 
@@ -58,6 +88,13 @@ pub struct SensitivityCurve {
 }
 
 impl SensitivityCurve {
+    pub fn new(degree_of_polynomial: usize) -> Self {
+        Self {
+            coefficients: vec![0.0; degree_of_polynomial + 1],
+            degree_of_polynomial,
+        }
+    }
+
     fn slowdown(&self, bw: f32) -> f32 {
         let mut slowdown = 0.0;
         for (i, coefficient) in self.coefficients.iter().enumerate() {
@@ -78,31 +115,32 @@ impl SensitivityCurve {
         distance.sqrt()
     }
 
-    fn fit(&mut self, records: &HashMap<u32, f32>) {
-        let n = records.len();
-        let mut x = DMatrix::<f32>::zeros(n, self.degree_of_polynomial + 1);
+    fn fit(&mut self, samples: &[(f32, f32)]) -> Result<(), ModelError> {
+        let needed = self.degree_of_polynomial + 1;
+        if samples.len() < needed {
+            return Err(ModelError::NotEnoughSamples {
+                needed,
+                provided: samples.len(),
+            });
+        }
 
-        for (i, &value) in records.values().enumerate() {
-            for j in 0..=self.degree_of_polynomial {
-                x[(i, j)] = value.powf(j as f32);
+        let mut vandermonde = DMatrix::<f32>::zeros(samples.len(), needed);
+        for (row, (bw_ratio, _)) in samples.iter().enumerate() {
+            vandermonde[(row, 0)] = 1.0;
+            for col in 1..needed {
+                vandermonde[(row, col)] = bw_ratio.powi(col as i32);
             }
         }
 
-        let y: Vec<f32> = records.values().cloned().collect();
-        let y = DVector::from(y);
-
-        // Solve for coefficients: X * coefficients = y
-        let svd = x.clone().svd(true, true);
-        let svd_result = svd.solve(&y, self.degree_of_polynomial as f32);
-        match svd_result {
-            Ok(coefficients) => {
-                self.coefficients = coefficients.data.into();
+        let y = DVector::from_vec(samples.iter().map(|(_, slowdown)| *slowdown).collect());
+        let svd = vandermonde.svd(true, true);
+        match svd.solve(&y, 1e-6) {
+            Ok(solution) => {
+                self.coefficients = solution.iter().copied().collect();
+                Ok(())
             }
-            Err(_) => {
-                println!("Failed to fit the model. Singular matrix or other issue.");
-            }
+            Err(_) => Err(ModelError::SingularMatrix),
         }
-        unimplemented!()
     }
 
     fn parameters(&self) -> Vec<f32> {
@@ -154,8 +192,13 @@ impl SensitivityScore {
         (self.score - other.score).abs()
     }
 
-    fn fit(&mut self, records: &HashMap<u32, f32>) {
-        self.score = records.values().sum::<f32>() / records.len() as f32;
+    fn fit(&mut self, samples: &[(f32, f32)]) -> Result<(), ModelError> {
+        if samples.is_empty() {
+            return Err(ModelError::EmptySamples);
+        }
+        let slowdown_sum: f32 = samples.iter().map(|(_, slowdown)| *slowdown).sum();
+        self.score = slowdown_sum / samples.len() as f32;
+        Ok(())
     }
 
     fn parameters(&self) -> Vec<f32> {
@@ -180,22 +223,152 @@ impl SensitivityScore {
     }
 }
 
+#[derive(Debug, Clone, Copy, PartialEq)]
+pub struct CompletionSample {
+    bandwidth: f32,
+    completion_time_ms: f32,
+}
+
+impl CompletionSample {
+    pub fn new(bandwidth: f32, completion_time_ms: f32) -> Result<Self, ModelError> {
+        let sample = Self {
+            bandwidth,
+            completion_time_ms,
+        };
+        sample.validate()?;
+        Ok(sample)
+    }
+
+    pub fn bandwidth(&self) -> f32 {
+        self.bandwidth
+    }
+
+    pub fn completion_time(&self) -> f32 {
+        self.completion_time_ms
+    }
+
+    fn validate(&self) -> Result<(), ModelError> {
+        if !self.bandwidth.is_finite() || self.bandwidth <= 0.0 {
+            return Err(ModelError::InvalidBandwidth);
+        }
+        if !self.completion_time_ms.is_finite() || self.completion_time_ms <= 0.0 {
+            return Err(ModelError::InvalidCompletionTime);
+        }
+        Ok(())
+    }
+
+    fn slowdown_pair(&self, baseline_bandwidth: f32, baseline_time: f32) -> (f32, f32) {
+        (
+            self.bandwidth / baseline_bandwidth,
+            self.completion_time_ms / baseline_time,
+        )
+    }
+}
+
+pub fn completion_samples_to_slowdown(
+    samples: &[CompletionSample],
+) -> Result<Vec<(f32, f32)>, ModelError> {
+    if samples.is_empty() {
+        return Err(ModelError::MissingBaselineSample);
+    }
+
+    for sample in samples {
+        sample.validate()?;
+    }
+
+    let baseline = samples
+        .iter()
+        .max_by(|a, b| {
+            a.bandwidth
+                .partial_cmp(&b.bandwidth)
+                .unwrap_or(Ordering::Equal)
+        })
+        .ok_or(ModelError::MissingBaselineSample)?;
+
+    let baseline_bandwidth = baseline.bandwidth;
+    let baseline_time = baseline.completion_time_ms;
+
+    let mut slowdown_pairs = Vec::with_capacity(samples.len());
+    for sample in samples {
+        slowdown_pairs.push(sample.slowdown_pair(baseline_bandwidth, baseline_time));
+    }
+
+    slowdown_pairs.sort_by(|a, b| a.0.partial_cmp(&b.0).unwrap_or(Ordering::Equal));
+    Ok(slowdown_pairs)
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
 
     #[test]
-    fn test_fit() {
-        let mut model = SensitivityCurve {
-            degree_of_polynomial: 2,
-            coefficients: Vec::new(),
-        };
-        let records = HashMap::from([(10, 1.0), (20, 2.0), (30, 3.0), (40, 4.0), (100, 5.0)]);
+    fn converts_completion_samples_to_slowdown_pairs() -> Result<(), ModelError> {
+        let samples = vec![
+            CompletionSample::new(100.0, 10.0)?,
+            CompletionSample::new(50.0, 15.0)?,
+            CompletionSample::new(75.0, 12.5)?,
+        ];
 
-        model.fit(&records);
+        let slowdown = completion_samples_to_slowdown(&samples)?;
+        assert_eq!(slowdown.len(), 3);
+        assert!((slowdown[0].0 - 0.5).abs() < 1e-6);
+        assert!((slowdown[0].1 - 1.5).abs() < 1e-6);
+        assert!((slowdown[2].0 - 1.0).abs() < 1e-6);
+        assert!((slowdown[2].1 - 1.0).abs() < 1e-6);
+        Ok(())
+    }
 
-        let coefficients = model.coefficients;
-        assert_eq!(coefficients.len(), 3);
-        assert_eq!(coefficients, [-0.0009, 0.1437, -0.4244]);
+    #[test]
+    fn rejects_missing_baseline_sample() {
+        let err = completion_samples_to_slowdown(&[]).unwrap_err();
+        assert_eq!(err, ModelError::MissingBaselineSample);
+    }
+
+    #[test]
+    fn fits_polynomial_curve() -> Result<(), ModelError> {
+        let mut curve = SensitivityCurve::new(2);
+        let samples: Vec<(f32, f32)> = (0..=5)
+            .map(|i| {
+                let bw = i as f32 * 0.2;
+                let slowdown = 1.0 + 2.0 * bw + 3.0 * bw * bw;
+                (bw, slowdown)
+            })
+            .collect();
+
+        curve.fit(&samples)?;
+        assert!((curve.coefficients[0] - 1.0).abs() < 1e-3);
+        assert!((curve.coefficients[1] - 2.0).abs() < 1e-3);
+        assert!((curve.coefficients[2] - 3.0).abs() < 1e-3);
+        Ok(())
+    }
+
+    #[test]
+    fn rejects_insufficient_curve_samples() {
+        let mut curve = SensitivityCurve::new(2);
+        let samples = vec![(0.0, 1.0)];
+        let err = curve.fit(&samples).unwrap_err();
+        assert_eq!(
+            err,
+            ModelError::NotEnoughSamples {
+                needed: 3,
+                provided: 1
+            }
+        );
+    }
+
+    #[test]
+    fn fits_sensitivity_score() -> Result<(), ModelError> {
+        let mut score = SensitivityScore { score: 0.0 };
+        let samples = vec![(0.5, 1.2), (0.75, 1.8), (1.0, 1.5)];
+        score.fit(&samples)?;
+        assert!((score.score - 1.5).abs() < 1e-6);
+        Ok(())
+    }
+
+    #[test]
+    fn score_fit_rejects_empty_samples() {
+        let mut score = SensitivityScore { score: 0.0 };
+        let err = score.fit(&[]).unwrap_err();
+        assert_eq!(err, ModelError::EmptySamples);
     }
 }

@@ -1,4 +1,3 @@
-use crate::kmeans::*;
 use crate::record::Record;
 use csv::ReaderBuilder;
 use log::debug;

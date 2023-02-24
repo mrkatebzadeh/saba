@@ -1,5 +1,4 @@
 mod config;
-mod kmeans;
 mod profile;
 mod record;
 use log::{debug, error, info};

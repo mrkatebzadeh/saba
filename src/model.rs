@@ -31,7 +31,7 @@ impl fmt::Display for ModelError {
 
 impl Error for ModelError {}
 
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, PartialEq)]
 pub enum Model {
     SensitivityCurve(SensitivityCurve),
     SensitivityScore(SensitivityScore),
@@ -81,7 +81,7 @@ impl Model {
     }
 }
 
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, PartialEq)]
 pub struct SensitivityCurve {
     pub coefficients: Vec<f32>,
     pub degree_of_polynomial: usize,
@@ -174,7 +174,7 @@ impl SensitivityCurve {
     }
 }
 
-#[derive(Debug, Clone, Copy)]
+#[derive(Debug, Clone, Copy, PartialEq)]
 pub struct SensitivityScore {
     pub score: f32,
 }

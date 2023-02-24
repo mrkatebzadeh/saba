@@ -19,6 +19,21 @@ struct Cli {
     #[arg(short, long, value_name = "FILE")]
     topology_file: Option<PathBuf>,
 
+    #[arg(long, value_name = "FILE")]
+    sensitivity_table: Option<PathBuf>,
+
+    #[arg(long, value_name = "INT")]
+    queue_budget: Option<usize>,
+
+    #[arg(long, value_name = "FLOAT")]
+    saba_capacity: Option<f32>,
+
+    #[arg(long, value_name = "INT")]
+    max_priority_levels: Option<usize>,
+
+    #[arg(long, value_name = "FLOAT")]
+    min_share: Option<f32>,
+
     #[arg(short, long, action = clap::ArgAction::Count)]
     verbose: u8,
 
@@ -49,6 +64,11 @@ struct TomlConfig {
 struct ControllerConfig {
     ip: Option<String>,
     port: Option<u16>,
+    sensitivity_table: Option<PathBuf>,
+    queue_budget: Option<usize>,
+    saba_capacity: Option<f32>,
+    max_priority_levels: Option<usize>,
+    min_share: Option<f32>,
 }
 
 #[derive(Debug)]
@@ -58,6 +78,11 @@ pub struct Config {
     pub port: u16,
     pub command: Commands,
     pub verbose: u8,
+    pub sensitivity_table: Option<PathBuf>,
+    pub queue_budget: usize,
+    pub saba_capacity: f32,
+    pub max_priority_levels: usize,
+    pub min_share: f32,
 }
 
 impl Config {
@@ -69,6 +94,11 @@ impl Config {
             port: 8080,
             command: Commands::Nop,
             verbose: 0,
+            sensitivity_table: None,
+            queue_budget: 4,
+            saba_capacity: 0.9,
+            max_priority_levels: 8,
+            min_share: 0.0,
         };
 
         let cli = Cli::parse();
@@ -86,6 +116,21 @@ impl Config {
                 if let Some(port) = controller_config.port {
                     config.port = port;
                 }
+                if let Some(sensitivity_table) = controller_config.sensitivity_table {
+                    config.sensitivity_table = Some(sensitivity_table);
+                }
+                if let Some(queue_budget) = controller_config.queue_budget {
+                    config.queue_budget = queue_budget;
+                }
+                if let Some(saba_capacity) = controller_config.saba_capacity {
+                    config.saba_capacity = saba_capacity;
+                }
+                if let Some(max_priority_levels) = controller_config.max_priority_levels {
+                    config.max_priority_levels = max_priority_levels;
+                }
+                if let Some(min_share) = controller_config.min_share {
+                    config.min_share = min_share;
+                }
                 if let Some(topology_file) = cli.topology_file.as_deref() {
                     config.topology_file = topology_file.to_string_lossy().to_string();
                 }
@@ -102,6 +147,26 @@ impl Config {
 
         if let Some(port) = cli.port {
             config.port = port;
+        }
+
+        if let Some(sensitivity_table) = cli.sensitivity_table {
+            config.sensitivity_table = Some(sensitivity_table);
+        }
+
+        if let Some(queue_budget) = cli.queue_budget {
+            config.queue_budget = queue_budget;
+        }
+
+        if let Some(saba_capacity) = cli.saba_capacity {
+            config.saba_capacity = saba_capacity;
+        }
+
+        if let Some(max_priority_levels) = cli.max_priority_levels {
+            config.max_priority_levels = max_priority_levels;
+        }
+
+        if let Some(min_share) = cli.min_share {
+            config.min_share = min_share;
         }
 
         if let Some(command) = cli.command {

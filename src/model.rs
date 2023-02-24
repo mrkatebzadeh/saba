@@ -45,6 +45,13 @@ impl Model {
         }
     }
 
+    pub fn derivative(&self, bw: f32) -> f32 {
+        match self {
+            Model::SensitivityCurve(curve) => curve.derivative(bw),
+            Model::SensitivityScore(score) => score.derivative(bw),
+        }
+    }
+
     pub fn parameters(&self) -> Vec<f32> {
         match self {
             Model::SensitivityCurve(curve) => curve.parameters(),
@@ -101,6 +108,14 @@ impl SensitivityCurve {
             slowdown += coefficient * bw.powi(i as i32);
         }
         slowdown
+    }
+
+    fn derivative(&self, bw: f32) -> f32 {
+        let mut derivative = 0.0;
+        for (i, coefficient) in self.coefficients.iter().enumerate().skip(1) {
+            derivative += *coefficient * i as f32 * bw.powi((i - 1) as i32);
+        }
+        derivative
     }
 
     fn distance(&self, other: &Model) -> f32 {
@@ -182,6 +197,10 @@ pub struct SensitivityScore {
 impl SensitivityScore {
     fn slowdown(&self, _: f32) -> f32 {
         self.score
+    }
+
+    fn derivative(&self, _bw: f32) -> f32 {
+        0.0
     }
 
     fn distance(&self, other: &Model) -> f32 {

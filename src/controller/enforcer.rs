@@ -1,58 +1,30 @@
-use crate::connection::Connection;
-use std::{collections::HashMap, fmt::Debug};
+use crate::allocator::AppAllocation;
+use saba::clustering::QueueAssignment;
+use std::fmt::Debug;
 
-pub trait Enforcer: Debug {
-    fn enforce(&mut self);
+#[derive(Debug, Clone, PartialEq)]
+pub struct EnforcementPlan {
+    pub queue_assignments: Vec<QueueAssignment>,
+    pub app_weights: Vec<AppAllocation>,
 }
 
-#[derive(Debug)]
-struct SabaEnforcer {
-    priority_levels: u8,
-
-    //app,src,dst,bw,priority
-    allocation_table: Vec<AllocationRecord>,
-
-    priority_to_app_table: HashMap<u8, Vec<String>>,
-    connection_to_app_table: HashMap<Connection, String>,
+pub trait Enforcer: Debug + Send {
+    fn enforce(&mut self, plan: &EnforcementPlan);
 }
 
-impl Enforcer for SabaEnforcer {
-    fn enforce(&mut self) {
-        unimplemented!()
+#[derive(Debug, Default)]
+pub struct MockSwitchEnforcer {
+    last_plan: Option<EnforcementPlan>,
+}
+
+impl MockSwitchEnforcer {
+    pub fn last_plan(&self) -> Option<&EnforcementPlan> {
+        self.last_plan.as_ref()
     }
 }
 
-impl SabaEnforcer {
-    #[allow(dead_code)]
-    fn priority_to_app(&self, priority: u8) -> Option<&Vec<String>> {
-        self.priority_to_app_table.get(&priority)
-    }
-
-    #[allow(dead_code)]
-    fn connection_to_app(&self, connection: &Connection) -> Option<&String> {
-        self.connection_to_app_table.get(connection)
-    }
-}
-
-#[derive(Debug)]
-#[allow(dead_code)]
-struct AllocationRecord {
-    app: String,
-    src: String,
-    dst: String,
-    bw: f32,
-    priority: u8,
-}
-
-impl AllocationRecord {
-    #[allow(dead_code)]
-    fn new(app: String, src: String, dst: String, bw: f32, priority: u8) -> Self {
-        AllocationRecord {
-            app,
-            src,
-            dst,
-            bw,
-            priority,
-        }
+impl Enforcer for MockSwitchEnforcer {
+    fn enforce(&mut self, plan: &EnforcementPlan) {
+        self.last_plan = Some(plan.clone());
     }
 }

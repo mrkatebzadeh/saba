@@ -6,13 +6,18 @@ mod node;
 mod scheduler;
 mod server;
 mod signal;
+mod state;
 mod topology;
 
 use log::{debug, error, info};
 extern crate daemonize;
+use crate::state::{
+    load_sensitivity_table_from_file, ControllerError, ControllerSettings, ControllerState,
+};
 use daemonize::Daemonize;
 use std::fs::File;
 use std::process;
+use std::sync::Arc;
 use std::thread;
 
 fn main() -> std::io::Result<()> {
@@ -43,6 +48,44 @@ fn main() -> std::io::Result<()> {
     .unwrap();
     debug!("Config: {:?}", config);
 
+    let sensitivity_table_path = match config.sensitivity_table.clone() {
+        Some(path) => path,
+        None => {
+            error!("Sensitivity table path is missing in the configuration");
+            return Err(std::io::Error::new(
+                std::io::ErrorKind::Other,
+                "sensitivity table path is required",
+            ));
+        }
+    };
+
+    let sensitivity_table = load_sensitivity_table_from_file(&sensitivity_table_path).map_err(
+        |err: ControllerError| {
+            error!(
+                "Failed to load sensitivity table from {}: {}",
+                sensitivity_table_path.display(),
+                err
+            );
+            std::io::Error::new(std::io::ErrorKind::Other, err.to_string())
+        },
+    )?;
+
+    let controller_settings = ControllerSettings {
+        queue_budget: config.queue_budget,
+        saba_capacity: config.saba_capacity,
+        max_priority_levels: config.max_priority_levels,
+        min_share: config.min_share,
+    };
+
+    let controller_state = Arc::new(
+        ControllerState::new(sensitivity_table, controller_settings).map_err(
+            |err: ControllerError| {
+                error!("Failed to initialize controller state: {}", err);
+                std::io::Error::new(std::io::ErrorKind::Other, err.to_string())
+            },
+        )?,
+    );
+
     let daemonize = Daemonize::new()
         .pid_file(pid) // Every method except `new` and `start`
         .chown_pid_file(true) // is optional, see `Daemonize` documentation
@@ -59,8 +102,11 @@ fn main() -> std::io::Result<()> {
 
             info!("Saba started");
 
+            let server_ip = config.ip.clone();
+            let server_port = config.port;
+            let server_state = Arc::clone(&controller_state);
             thread::spawn(move || {
-                server::serve(&config.ip[..], config.port).unwrap();
+                server::serve(&server_ip, server_port, server_state).unwrap();
             });
             signal_handler.join().unwrap();
             process::exit(1);

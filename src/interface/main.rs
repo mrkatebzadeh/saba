@@ -1,10 +1,11 @@
-mod actions;
 mod config;
 mod signal;
 use std::thread;
 
 use crate::config::Config;
 use log::{debug, error, info};
+use saba::client::ConnectionManager;
+use tokio::runtime::Runtime;
 extern crate daemonize;
 use daemonize::Daemonize;
 use std::fs::File;
@@ -58,15 +59,23 @@ fn main() -> std::io::Result<()> {
                 let ip = config.ip.clone();
                 let port = config.port;
                 thread::spawn(move || {
-                    actions::init(ip, port).unwrap();
-                });
-            }
-            {
-                let ip = config.ip.clone();
-                let port = config.port;
-                info!("Registering...");
-                thread::spawn(move || {
-                    actions::register("App1", ip, port, "register").unwrap();
+                    let controller_addr = format!("http://{ip}:{port}");
+                    let runtime = match Runtime::new() {
+                        Ok(runtime) => runtime,
+                        Err(err) => {
+                            error!("Failed to create Tokio runtime: {err}");
+                            return;
+                        }
+                    };
+
+                    if let Err(err) = runtime.block_on(async move {
+                        let manager = ConnectionManager::connect("App1", controller_addr).await?;
+                        let priority = manager.register().await?;
+                        info!("Registered App1 with priority {priority}");
+                        manager.deregister().await
+                    }) {
+                        error!("Connection manager error: {err}");
+                    }
                 });
             }
             signal_handler.join().unwrap();

@@ -27,6 +27,7 @@ path = "src/profiler/main.rs"
 toml = "0.7.0"
 clap = { version = "4.1.4", features = ["derive"] }
 serde = { version = "1.0.152", features = ["derive"] }
+serde_json = "1.0"
 tonic = { version = "0.8.3", features = ["tls"] }
 prost = "0.11.6"
 tokio = { version = "1.24.2", features = ["full"] }
@@ -43,3 +44,6 @@ nalgebra = "0.32.3"
 
 [build-dependencies]
 tonic-build = "0.8.4"
+
+[dev-dependencies]
+tempfile = "3.10"

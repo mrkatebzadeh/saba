@@ -19,6 +19,15 @@ struct Cli {
     #[arg(short, long, action = clap::ArgAction::Count)]
     verbose: u8,
 
+    #[arg(long, value_name = "FILE")]
+    profile_csv: Option<PathBuf>,
+
+    #[arg(long, value_name = "FILE")]
+    output: Option<PathBuf>,
+
+    #[arg(long, value_name = "INT")]
+    degree: Option<usize>,
+
     #[command(subcommand)]
     command: Option<Commands>,
 }
@@ -39,30 +48,31 @@ struct TomlConfig {
 
 #[derive(Debug, Deserialize)]
 struct ProfilerConfig {
-    number_of_nodes: Option<u32>,
-    degree_of_polynomial: Option<u8>,
+    profile_csv: Option<PathBuf>,
+    output: Option<PathBuf>,
+    degree_of_polynomial: Option<usize>,
 }
 
 #[derive(Debug)]
 pub struct Config {
-    pub application: String,
-    pub number_of_nodes: u32,
-    pub degree_of_polynomial: u8,
+    pub profile_csv: Option<PathBuf>,
+    pub output_path: Option<PathBuf>,
+    pub degree_of_polynomial: usize,
     pub command: Commands,
     pub verbose: u8,
 }
 
 impl Config {
     pub fn new() -> Config {
-        let mut config = Config {
-            application: String::new(),
-            number_of_nodes: 0,
-            degree_of_polynomial: 0,
-            command: Commands::Nop,
-            verbose: 0,
-        };
-
         let cli = Cli::parse();
+
+        let mut config = Config {
+            profile_csv: None,
+            output_path: None,
+            degree_of_polynomial: 2,
+            command: Commands::Nop,
+            verbose: cli.verbose,
+        };
 
         if let Some(config_path) = cli.config.as_deref() {
             println!("Value for config: {}", config_path.display());
@@ -71,8 +81,11 @@ impl Config {
             let toml_config: TomlConfig =
                 toml::from_str(&toml_config_str).expect("Unable to parse config file.");
             if let Some(profiler_config) = toml_config.profiler {
-                if let Some(number_of_nodes) = profiler_config.number_of_nodes {
-                    config.number_of_nodes = number_of_nodes;
+                if let Some(profile_csv) = profiler_config.profile_csv {
+                    config.profile_csv = Some(profile_csv);
+                }
+                if let Some(output) = profiler_config.output {
+                    config.output_path = Some(output);
                 }
                 if let Some(degree_of_polynomial) = profiler_config.degree_of_polynomial {
                     config.degree_of_polynomial = degree_of_polynomial;
@@ -80,8 +93,16 @@ impl Config {
             }
         }
 
-        if Some(cli.verbose).is_some() {
-            config.verbose = cli.verbose;
+        if let Some(profile_csv) = cli.profile_csv {
+            config.profile_csv = Some(profile_csv);
+        }
+
+        if let Some(output) = cli.output {
+            config.output_path = Some(output);
+        }
+
+        if let Some(degree) = cli.degree {
+            config.degree_of_polynomial = degree;
         }
 
         if let Some(command) = cli.command {

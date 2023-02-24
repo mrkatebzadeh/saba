@@ -1,4 +1,6 @@
 app,dataset_size,number_of_nodes,bw,time
-app1,1,1,Ten,3
-app1,1,1,TwentyFive,2
-app1,1,1,Hundred,1
+app1,1,1,100,10
+app1,1,1,75,15
+app1,1,1,50,25
+app2,1,1,100,8
+app2,1,1,50,16

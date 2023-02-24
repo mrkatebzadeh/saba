@@ -36,7 +36,7 @@ fn main() -> std::io::Result<()> {
 
     if let Err(err) = dispatch(&config) {
         error!("Profiler command failed: {err}");
-        return Err(io::Error::new(io::ErrorKind::Other, err.to_string()));
+        return Err(io::Error::other(err.to_string()));
     }
 
     Ok(())

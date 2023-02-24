@@ -6,12 +6,11 @@ use saba::model::{
     SensitivityScore,
 };
 use serde::Serialize;
-use std::collections::{HashMap, VecDeque};
+use std::collections::HashMap;
 use std::fmt;
 use std::fs::File;
 use std::io::Write;
 use std::path::Path;
-use std::sync::{Condvar, Mutex};
 
 #[derive(Debug)]
 pub enum ProfilerError {
@@ -175,50 +174,6 @@ impl Profiler {
 
     pub fn sensitivity_table(&self) -> &HashMap<String, Model> {
         &self.sensitivity_table
-    }
-}
-
-#[derive(Debug)]
-pub struct ProfilingJob {
-    pub applications: Vec<String>,
-}
-
-#[derive(Debug)]
-pub struct ProfilingQueue {
-    jobs: Mutex<Option<VecDeque<ProfilingJob>>>,
-    cvar: Condvar,
-}
-
-impl ProfilingQueue {
-    pub fn new() -> Self {
-        ProfilingQueue {
-            jobs: Mutex::new(Some(VecDeque::new())),
-            cvar: Condvar::new(),
-        }
-    }
-
-    pub fn profile(&self, unprofiled_applications: Vec<ProfilingJob>) {
-        let mut jobs = self.jobs.lock().unwrap();
-        if let Some(queue) = jobs.as_mut() {
-            queue.extend(unprofiled_applications);
-            self.cvar.notify_all();
-        }
-    }
-
-    pub fn wait_for_job(&self) -> Option<ProfilingJob> {
-        let mut jobs = self.jobs.lock().unwrap();
-        loop {
-            match jobs.as_mut()?.pop_front() {
-                Some(job) => return Some(job),
-                None => jobs = self.cvar.wait(jobs).unwrap(),
-            }
-        }
-    }
-
-    pub fn end(&self) {
-        let mut jobs = self.jobs.lock().unwrap();
-        *jobs = None;
-        self.cvar.notify_all();
     }
 }
 

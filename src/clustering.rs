@@ -390,8 +390,8 @@ mod tests {
         let assignments = map_priority_levels_to_queues(&clusters, 2).unwrap();
         assert_eq!(assignments.len(), 2);
         assert_eq!(assignments[0].queue_index, 0);
-        assert!(assignments[0].priority_levels.len() >= 1);
-        assert!(assignments[1].priority_levels.len() >= 1);
+        assert!(!assignments[0].priority_levels.is_empty());
+        assert!(!assignments[1].priority_levels.is_empty());
         assert_eq!(
             assignments
                 .iter()

@@ -52,10 +52,7 @@ fn main() -> std::io::Result<()> {
         Some(path) => path,
         None => {
             error!("Sensitivity table path is missing in the configuration");
-            return Err(std::io::Error::new(
-                std::io::ErrorKind::Other,
-                "sensitivity table path is required",
-            ));
+            return Err(std::io::Error::other("sensitivity table path is required"));
         }
     };
 
@@ -66,7 +63,7 @@ fn main() -> std::io::Result<()> {
                 sensitivity_table_path.display(),
                 err
             );
-            std::io::Error::new(std::io::ErrorKind::Other, err.to_string())
+            std::io::Error::other(err.to_string())
         },
     )?;
 
@@ -81,7 +78,7 @@ fn main() -> std::io::Result<()> {
         ControllerState::new(sensitivity_table, controller_settings).map_err(
             |err: ControllerError| {
                 error!("Failed to initialize controller state: {}", err);
-                std::io::Error::new(std::io::ErrorKind::Other, err.to_string())
+                std::io::Error::other(err.to_string())
             },
         )?,
     );

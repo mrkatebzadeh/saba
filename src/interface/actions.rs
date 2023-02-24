@@ -45,9 +45,8 @@ pub async fn register(
     info!("Registering to {}", addr);
     let mut client = RegisterClient::connect(addr).await?;
 
-    let name = app;
     let request = tonic::Request::new(RegisterRequest {
-        name: String::from(name),
+        name: String::from(app),
         action: String::from(action),
     });
     let response = client.register(request).await?;
@@ -65,6 +64,7 @@ pub mod connection {
     tonic::include_proto!("connection");
 }
 
+#[allow(dead_code)]
 #[tokio::main]
 pub async fn connection(
     app: &str,
@@ -78,7 +78,6 @@ pub async fn connection(
     info!("Registering connection to {}", addr);
     let mut client = ConnectionClient::connect(addr).await?;
 
-    let name = app;
     let request = tonic::Request::new(ConnectionRequest {
         app: String::from(app),
         src: String::from(src),

@@ -102,8 +102,14 @@ impl Topology {
                     .map(|x| x.trim().parse::<u16>().unwrap())
                     .collect();
                 let new_switch = Switch::new(node_name, node_ip, number_of_ports, weights);
+                let switch_name = new_switch.name();
+                let switch_ip = new_switch.ip();
+                let switch_weights = new_switch.weights();
                 let adjacent: Vec<String> = line[5].split(' ').map(|x| x.to_string()).collect();
-                debug!("Added switch: {new_switch:?}");
+                debug!(
+                    "Added switch {} (ip: {}, ports: {}, weights: {:?})",
+                    switch_name, switch_ip, new_switch.number_of_ports, switch_weights
+                );
                 topology.add_switch(new_switch, adjacent);
             } else {
                 let weights: Vec<u16> = line[3]
@@ -113,7 +119,13 @@ impl Topology {
                     .collect();
                 let switch = line[4].trim();
                 let new_server = Server::new(node_name, node_ip, weights);
-                debug!("Added server: {new_server:?}");
+                let server_name = new_server.name();
+                let server_ip = new_server.ip();
+                let server_weights = new_server.weights();
+                debug!(
+                    "Added server {} (ip: {}, weights: {:?})",
+                    server_name, server_ip, server_weights
+                );
                 topology.add_server(new_server, vec![switch.to_string()]);
             }
         }

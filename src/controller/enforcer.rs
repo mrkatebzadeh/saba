@@ -13,18 +13,8 @@ pub trait Enforcer: Debug + Send {
 }
 
 #[derive(Debug, Default)]
-pub struct MockSwitchEnforcer {
-    last_plan: Option<EnforcementPlan>,
-}
-
-impl MockSwitchEnforcer {
-    pub fn last_plan(&self) -> Option<&EnforcementPlan> {
-        self.last_plan.as_ref()
-    }
-}
+pub struct MockSwitchEnforcer;
 
 impl Enforcer for MockSwitchEnforcer {
-    fn enforce(&mut self, plan: &EnforcementPlan) {
-        self.last_plan = Some(plan.clone());
-    }
+    fn enforce(&mut self, _plan: &EnforcementPlan) {}
 }

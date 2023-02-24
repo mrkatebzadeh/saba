@@ -79,7 +79,6 @@ impl From<ClusteringError> for ControllerError {
 
 #[derive(Debug, Clone)]
 struct RegisteredApplication {
-    name: String,
     priority_level: u8,
     model: Model,
 }
@@ -128,9 +127,7 @@ impl ControllerState {
             registered: Mutex::new(HashMap::new()),
             connections: Mutex::new(HashMap::new()),
             allocator: SabaAllocator::new(200, 0.05, settings.min_share),
-            enforcer: Mutex::new(
-                Box::new(MockSwitchEnforcer::default()) as Box<dyn Enforcer + Send>
-            ),
+            enforcer: Mutex::new(Box::new(MockSwitchEnforcer) as Box<dyn Enforcer + Send>),
             queue_assignments: Mutex::new(Vec::new()),
             app_allocations: Mutex::new(Vec::new()),
         })
@@ -148,7 +145,6 @@ impl ControllerState {
                 .entry(name.to_string())
                 .and_modify(|app| app.model = model.clone())
                 .or_insert(RegisteredApplication {
-                    name: name.to_string(),
                     priority_level: 0,
                     model,
                 });
@@ -202,6 +198,7 @@ impl ControllerState {
         Ok(())
     }
 
+    #[cfg(test)]
     pub fn last_plan(&self) -> EnforcementPlan {
         EnforcementPlan {
             queue_assignments: self.queue_assignments.lock().unwrap().clone(),
@@ -209,6 +206,7 @@ impl ControllerState {
         }
     }
 
+    #[cfg(test)]
     pub fn set_enforcer(&self, enforcer: Box<dyn Enforcer + Send>) {
         *self.enforcer.lock().unwrap() = enforcer;
     }
@@ -295,7 +293,7 @@ pub fn load_sensitivity_table_from_file<P: AsRef<Path>>(
                 })
             }
             "score" => Model::SensitivityScore(SensitivityScore {
-                score: entry.coefficients.get(0).copied().unwrap_or(1.0),
+                score: entry.coefficients.first().copied().unwrap_or(1.0),
             }),
             _ => {
                 debug!("Skipping unsupported model type: {}", entry.model_type);
@@ -311,6 +309,7 @@ pub fn load_sensitivity_table_from_file<P: AsRef<Path>>(
 mod tests {
     use super::*;
     use saba::model::SensitivityCurve;
+    use std::sync::{Arc, Mutex};
     use tempfile::NamedTempFile;
 
     fn curve_model(coefficients: Vec<f32>) -> Model {
@@ -330,6 +329,23 @@ mod tests {
             saba_capacity: 1.0,
             max_priority_levels: 2,
             min_share: 0.0,
+        }
+    }
+
+    #[derive(Debug)]
+    struct RecordingEnforcer {
+        called: Arc<Mutex<bool>>,
+    }
+
+    impl RecordingEnforcer {
+        fn new(flag: Arc<Mutex<bool>>) -> Self {
+            Self { called: flag }
+        }
+    }
+
+    impl Enforcer for RecordingEnforcer {
+        fn enforce(&mut self, _plan: &EnforcementPlan) {
+            *self.called.lock().unwrap() = true;
         }
     }
 
@@ -360,5 +376,15 @@ mod tests {
         .unwrap();
         let table = load_sensitivity_table_from_file(file.path()).unwrap();
         assert_eq!(table.len(), 2);
+    }
+
+    #[test]
+    fn allows_swapping_enforcer() {
+        let models = HashMap::from([("app_a".to_string(), score_model(1.0))]);
+        let state = ControllerState::new(models, test_settings()).unwrap();
+        let invoked = Arc::new(Mutex::new(false));
+        state.set_enforcer(Box::new(RecordingEnforcer::new(invoked.clone())));
+        assert!(state.register_application("app_a").is_ok());
+        assert!(*invoked.lock().unwrap());
     }
 }

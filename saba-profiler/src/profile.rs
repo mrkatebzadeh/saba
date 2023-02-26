@@ -22,7 +22,7 @@
 use crate::record::Record;
 use csv::ReaderBuilder;
 use log::debug;
-use saba::model::{
+use saba_core::model::{
     completion_samples_to_slowdown, CompletionSample, Model, ModelError, SensitivityCurve,
     SensitivityScore,
 };

@@ -20,9 +20,9 @@
 */
 
 use async_trait::async_trait;
-use saba::client::{ConnectionError, ConnectionManager, ControllerRpc};
-use saba::clustering::{cluster_applications, map_priority_levels_to_queues};
-use saba::model::{completion_samples_to_slowdown, CompletionSample, Model, SensitivityCurve};
+use saba_core::client::{ConnectionError, ConnectionManager, ControllerRpc};
+use saba_core::clustering::{cluster_applications, map_priority_levels_to_queues};
+use saba_core::model::{completion_samples_to_slowdown, CompletionSample, Model, SensitivityCurve};
 use std::collections::HashSet;
 use std::sync::{Arc, Mutex};
 

@@ -185,7 +185,9 @@ mod tests {
 
     #[test]
     fn test_dfs_from_file() {
-        let topology = Topology::generate_topology_from_file("tests/topology.csv".to_string());
+        let path = std::path::Path::new(env!("CARGO_MANIFEST_DIR"))
+            .join("tests/topology.csv");
+        let topology = Topology::generate_topology_from_file(path.display().to_string());
         println!("{topology:?}");
         assert!(
             topology.dfs("switch1", "server1").unwrap() == vec!["switch1", "switch4", "server1"]

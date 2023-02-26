@@ -1,29 +1,20 @@
-[package]
-name = "saba"
+[workspace]
+members = [
+    "saba-core",
+    "saba-controller",
+    "saba-profiler",
+    "saba-client",
+]
+resolver = "2"
+
+[workspace.package]
 version = "0.1.0"
 edition = "2021"
-description = "Saba Bandwidth Allocation Scheme"
-repository = "https://github.com/mrkatebzadeh/saba-controller"
 license = "MIT"
+description = "Saba Application-Aware Bandwidth Allocation Scheme"
+repository = "https://github.com/mrkatebzadeh/saba-controller"
 
-[lib]
-name = "saba"
-path = "src/lib.rs"
-
-[[bin]]
-name = "controller"
-path = "src/controller/main.rs"
-
-[[bin]]
-name = "interface"
-path = "src/interface/main.rs"
-
-[[bin]]
-name = "profiler"
-path = "src/profiler/main.rs"
-
-
-[dependencies]
+[workspace.dependencies]
 async-trait = "0.1"
 toml = "0.7.0"
 clap = { version = "4.1.4", features = ["derive"] }
@@ -42,10 +33,5 @@ daemonize = "0.5.0"
 rand = "0.6.5"
 nalgebra = "0.32.3"
 thiserror = "1"
-
-
-[build-dependencies]
-tonic-build = "0.8.4"
-
-[dev-dependencies]
 tempfile = "3.10"
+saba-core = { path = "saba-core" }

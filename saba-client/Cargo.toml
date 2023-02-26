@@ -1,0 +1,17 @@
+[package]
+name = "saba-client"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+repository.workspace = true
+description = "Client daemon for the Saba bandwidth allocation scheme"
+
+[dependencies]
+saba-core.workspace = true
+tokio.workspace = true
+simplelog.workspace = true
+log.workspace = true
+daemonize.workspace = true
+clap.workspace = true
+toml.workspace = true
+serde.workspace = true

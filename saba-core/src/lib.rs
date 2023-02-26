@@ -23,4 +23,18 @@ pub mod client;
 pub mod clustering;
 pub mod model;
 
+pub mod proto {
+    pub mod init {
+        tonic::include_proto!("init");
+    }
+
+    pub mod register {
+        tonic::include_proto!("register");
+    }
+
+    pub mod connection {
+        tonic::include_proto!("connection");
+    }
+}
+
 /* lib.rs ends here */

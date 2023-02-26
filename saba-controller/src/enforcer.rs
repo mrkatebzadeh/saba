@@ -20,7 +20,7 @@
 */
 
 use crate::allocator::AppAllocation;
-use saba::clustering::QueueAssignment;
+use saba_core::clustering::QueueAssignment;
 use std::fmt::Debug;
 
 #[derive(Debug, Clone, PartialEq)]

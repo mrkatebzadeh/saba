@@ -25,7 +25,7 @@ use std::thread;
 
 use crate::config::Config;
 use log::{debug, error, info};
-use saba::client::ConnectionManager;
+use saba_core::client::ConnectionManager;
 use tokio::runtime::Runtime;
 extern crate daemonize;
 use daemonize::Daemonize;

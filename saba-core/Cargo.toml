@@ -1,0 +1,23 @@
+[package]
+name = "saba-core"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+repository.workspace = true
+description = "Shared core library for Saba components"
+build = "build.rs"
+
+[dependencies]
+async-trait.workspace = true
+local-ip-address.workspace = true
+tokio.workspace = true
+tonic.workspace = true
+prost.workspace = true
+thiserror.workspace = true
+nalgebra.workspace = true
+
+[dev-dependencies]
+tempfile.workspace = true
+
+[build-dependencies]
+tonic-build = "0.8.4"

@@ -23,10 +23,10 @@ use crate::allocator::{AppAllocation, SabaAllocator};
 use crate::connection::Connection;
 use crate::enforcer::{EnforcementPlan, Enforcer, MockSwitchEnforcer};
 use log::debug;
-use saba::clustering::{
+use saba_core::clustering::{
     cluster_applications, map_priority_levels_to_queues, ClusteringError, QueueAssignment,
 };
-use saba::model::{Model, SensitivityCurve, SensitivityScore};
+use saba_core::model::{Model, SensitivityCurve, SensitivityScore};
 use serde::Deserialize;
 use std::collections::HashMap;
 use std::fmt;
@@ -329,7 +329,7 @@ pub fn load_sensitivity_table_from_file<P: AsRef<Path>>(
 #[cfg(test)]
 mod tests {
     use super::*;
-    use saba::model::SensitivityCurve;
+    use saba_core::model::SensitivityCurve;
     use std::sync::{Arc, Mutex};
     use tempfile::NamedTempFile;
 

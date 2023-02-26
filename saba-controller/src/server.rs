@@ -21,6 +21,7 @@
 
 use crate::state::{ControllerError, ControllerState};
 use log::{info, warn};
+use saba_core::proto::{connection, init, register};
 use std::sync::Arc;
 use tonic::{transport::Server, Request, Response, Status};
 
@@ -30,18 +31,6 @@ use init::init_server::{Init, InitServer};
 use init::{InitRequest, InitResponse};
 use register::register_server::{Register, RegisterServer};
 use register::{RegisterRequest, RegisterResponse};
-
-pub mod init {
-    tonic::include_proto!("init");
-}
-
-pub mod register {
-    tonic::include_proto!("register");
-}
-
-pub mod connection {
-    tonic::include_proto!("connection");
-}
 
 #[derive(Clone)]
 struct ControllerRpcService {

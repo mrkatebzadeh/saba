@@ -9,13 +9,24 @@
 - **Controller** – consumes the sensitivity table to allocate bandwidth across flows and programs network queues according to the Saba policy.
 - **Saba library & interface** – a connection manager that applications link against to expose their intents and receive the controller’s allocation decisions.
 
+## Workspace layout
+
+This repository is organized as a Cargo workspace with the following members:
+
+- `saba-core` – shared models, clustering logic, client RPC code, and protobuf bindings.
+- `saba-controller` – the controller daemon that enforces Saba’s bandwidth allocation policy.
+- `saba-client` – the client/interface daemon that applications run locally to talk to the controller.
+- `saba-profiler` – the offline profiler that builds sensitivity tables from application traces.
+
 ## Installation
 
 ### Cargo
 
-* Install the rust toolchain in order to have cargo installed by following
-  [this](https://www.rust-lang.org/tools/install) guide.
-* run `cargo install saba-controller`
+* Install the Rust toolchain by following the [official guide](https://www.rust-lang.org/tools/install).
+* Build or install the workspace members you need:
+  * `cargo install --path saba-controller`
+  * `cargo install --path saba-client`
+  * `cargo install --path saba-profiler`
 
 ## License
 

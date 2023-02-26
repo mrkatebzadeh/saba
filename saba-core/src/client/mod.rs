@@ -27,24 +27,12 @@ use std::sync::Arc;
 use tokio::sync::Mutex;
 use tonic::{Request, Status};
 
-use connection::connection_client::ConnectionClient;
-use connection::ConnectionRequest;
-use init::init_client::InitClient;
-use init::InitRequest;
-use register::register_client::RegisterClient;
-use register::RegisterRequest;
-
-pub mod init {
-    tonic::include_proto!("init");
-}
-
-pub mod register {
-    tonic::include_proto!("register");
-}
-
-pub mod connection {
-    tonic::include_proto!("connection");
-}
+use crate::proto::connection::connection_client::ConnectionClient;
+use crate::proto::connection::ConnectionRequest;
+use crate::proto::init::init_client::InitClient;
+use crate::proto::init::InitRequest;
+use crate::proto::register::register_client::RegisterClient;
+use crate::proto::register::RegisterRequest;
 
 #[derive(Debug, thiserror::Error)]
 pub enum ConnectionError {

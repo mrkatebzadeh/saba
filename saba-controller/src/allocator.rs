@@ -20,7 +20,7 @@
 */
 
 use log::debug;
-use saba::model::Model;
+use saba_core::model::Model;
 use std::cmp::Ordering;
 
 #[derive(Debug, Clone, PartialEq)]
@@ -132,7 +132,7 @@ fn project_to_simplex(values: &mut [f32], target_sum: f32) {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use saba::model::{Model, SensitivityCurve};
+    use saba_core::model::{Model, SensitivityCurve};
 
     fn curve(coefficients: Vec<f32>) -> Model {
         Model::SensitivityCurve(SensitivityCurve {

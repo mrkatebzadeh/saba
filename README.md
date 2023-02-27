@@ -9,28 +9,54 @@
 - **Controller** – consumes the sensitivity table to allocate bandwidth across flows and programs network queues according to the Saba policy.
 - **Saba library & interface** – a connection manager that applications link against to expose their intents and receive the controller’s allocation decisions.
 
-## Workspace layout
+## Components
 
-This repository is organized as a Cargo workspace with the following members:
+Saba is organized as a Cargo workspace composed of the following crates:
 
-- `saba-core` – shared models, clustering logic, client RPC code, and protobuf bindings.
-- `saba-controller` – the controller daemon that enforces Saba’s bandwidth allocation policy.
-- `saba-client` – the client/interface daemon that applications run locally to talk to the controller.
-- `saba-profiler` – the offline profiler that builds sensitivity tables from application traces.
+- `saba-core` – shared models, clustering logic, client RPC code, and protobuf bindings used by every other binary.
+- `saba-controller` – the controller daemon that enforces Saba’s bandwidth allocation policy inside the data center.
+- `saba-client` – the client/interface daemon that applications run locally to communicate intents to the controller.
+- `saba-profiler` – the offline profiler that ingests traces and builds bandwidth sensitivity tables.
+
+## Getting Started
+
+1. Clone the repository and enter the workspace:
+   ```bash
+   git clone https://github.com/mrkatebzadeh/saba-controller
+   cd saba-controller
+   ```
+2. Build every crate in the workspace:
+   ```bash
+   cargo build --workspace
+   ```
+3. Run the full test suite to validate the setup:
+   ```bash
+   cargo test --workspace
+   ```
 
 ## Installation
+
 
 ### Cargo
 
 * Install the Rust toolchain by following the [official guide](https://www.rust-lang.org/tools/install).
-* Build or install the workspace members you need:
-  * `cargo install --path saba-controller`
-  * `cargo install --path saba-client`
-  * `cargo install --path saba-profiler`
+* Build or install the binaries you need directly from the workspace root:
+  * `cargo install --locked --path saba-controller`
+  * `cargo install --locked --path saba-client`
+  * `cargo install --locked --path saba-profiler`
+
+## Development workflow
+
+Helpful commands while iterating locally:
+
+- `cargo fmt --all` – format every Rust crate in the workspace.
+- `cargo clippy --all-targets --all-features --workspace` – lint all code.
+- `cargo test --workspace` – execute unit, integration, and doc tests across crates.
 
 ## License
 
-Licensed under MIT license ([LICENSE](LICENSE) or http://opensource.org/licenses/MIT)
+
+This project is licensed under the GNU General Public License version 3 or later. See [LICENSE](LICENSE) for details.
 
 ## Cite this work
 

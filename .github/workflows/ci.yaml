@@ -22,11 +22,11 @@ jobs:
         SABA_NO_IBVERBS=YES cmake -H. -Bbuild -G "Unix Makefiles" -DCMAKE_BUILD_TYPE=Debug -DENABLE_COVERAGE=On
     - name: building
       run: |
-        cmake --build build --config Debug --target saba_socket -j4
+        cmake --build build --config Debug --target socket_test -j4
     - name: testing
       run: |
         cd build
         cd test
-        ./saba_socket
+        ./socket_test
         bash <(curl -s https://codecov.io/bash)
     

@@ -2,6 +2,7 @@
 
 # SaBA: Smart Bandwidth Allocator
 
+[![CI](https://github.com/mrkatebzadeh/Saba/workflows/CI/badge.svg)](https://github.com/mrkatebzadeh/Saba/actions)
 -------------------------------------------------------------------------------
 
 **Table of Contents**

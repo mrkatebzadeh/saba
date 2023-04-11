@@ -1,20 +1,20 @@
 -------------------------------------------------------------------------------
 
-# SaBA: Smart Bandwidth Allocator
+# Saba: Sensitivity-Aware Bandwidth Allocator
 
 [![CI](https://github.com/mrkatebzadeh/Saba/workflows/CI/badge.svg)](https://github.com/mrkatebzadeh/Saba/actions)
 -------------------------------------------------------------------------------
 
 **Table of Contents**
 
-- [SaBA](#saba)
+- [Saba](#saba)
 - [Prerequisites](#prerequisites)
 - [Install](#install)
 - [Configuration](#configuration)
 - [Running Tests](#running-tests)
 - [Contacts](#contacts)
 
-## SaBA ##
+## Saba ##
 
 This package provides a smart/application-aware bandwidth allocator and consists of following components:
 - saba_ibverbs
@@ -25,10 +25,8 @@ This package provides a smart/application-aware bandwidth allocator and consists
 
 ## Prerequisites ##
 
-Before you install SaBA, you must have the following libraries:
+Before you install Saba, make sure you have docker installed on your system.
 
-- cmake
-- rdma-core libibverbs1 librdmacm1 libibmad5 libibumad3 librdmacm1 ibverbs-providers rdmacm-utils infiniband-diags libfabric1 ibverbs-utils libibverbs-dev
 
 ## Install ##
 
@@ -36,17 +34,25 @@ Clone the repository:
 ```
 git clone https://github.com/ease-lab/Saba.git
 ```
-Then you can simply make the package:
+Then you can simply build and run the docker container:
 ```
 cd Saba
-cmake -S . -B build
-cmake --build build
+./run
+
 ```
-To prevent any component from being compiled, use `SABA_NO_X=YES`, where **X** is the name of component.
+
+To install the required packages inside the docker container, run the following:
+
 ```
-cd Saba
-SABA_NO_IBVERBS=YES cmake -S . -B build
-cmake --build build
+make install_tests
+
+```
+
+And finally, make the file as follows. To prevent any component from being compiled, use `SABA_NO_X=YES`, where **X** is the name of component:
+```
+make prepare
+SABA_NO_IBVERBS=YES cmake -H. -Bbuild -G "Unix Makefiles" -DCMAKE_BUILD_TYPE=Debug
+cmake --build build -j4
 ```
 
 ## Configuration ##

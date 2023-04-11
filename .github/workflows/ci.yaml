@@ -1,0 +1,32 @@
+name: CI
+
+on:
+  push:
+    branches: [main, master, dev]
+  pull_request:
+
+jobs:
+  test:
+    name: Test Suite
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2
+    - name: install
+      run: |
+        make install_tests
+    - name: prepare
+      run: |
+        make prepare
+    - name: configure
+      run: |
+        SABA_NO_IBVERBS=YES cmake -H. -Bbuild -G "Unix Makefiles" -DCMAKE_BUILD_TYPE=Debug -DENABLE_COVERAGE=On
+    - name: building
+      run: |
+        cmake --build build --config Debug --target coverage -j4
+    - name: testing
+      run: |
+        cd build
+        cd tests
+        ./unit_tests
+        bash <(curl -s https://codecov.io/bash)
+    

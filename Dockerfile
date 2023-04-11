@@ -1,9 +1,9 @@
-FROM gcc:latest
+FROM ubuntu:latest
 
 WORKDIR /opt/Saba
 
-RUN apt-get -y update && apt-get install -y cmake
-RUN useradd -r  saba
+RUN apt-get -y update && apt-get install -y cmake sudo
+RUN useradd -r  saba && echo "saba:saba" | chpasswd && adduser saba sudo
 RUN groupmod -o -g 1000 saba
 RUN usermod -o -u 1000 saba
 USER saba

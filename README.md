@@ -16,7 +16,6 @@
 ## SaBA ##
 
 This package provides a smart/application-aware bandwidth allocator and consists of following components:
-- workload
 - saba_ibverbs
 - saba_socket
 - Controller

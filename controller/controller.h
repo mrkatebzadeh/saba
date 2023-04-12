@@ -116,9 +116,9 @@ class Controller {
   std::vector<IBSwitch> getPathSwitches(Connection connection);
 };
 
-int appRegisterHandler(Controller* controller, std::string application_name);
-int connectionCreateHandler(Controller* controller, std::string src,
+int appRegisterHandler(Controller& controller, std::string application_name);
+int connectionCreateHandler(Controller& controller, std::string src,
                             std::string dst, std::string application);
-void connectionDestroyHandler(Controller* controller, int connection_fd);
+void connectionDestroyHandler(Controller& controller, int connection_fd);
 
 #endif

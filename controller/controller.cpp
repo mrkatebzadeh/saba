@@ -210,3 +210,17 @@ std::ostream& operator<<(std::ostream& os,
   return os;
 }
 
+int appRegisterHandler(Controller& controller, std::string application_name) {
+  return 0; // TODO
+}
+
+int connectionCreateHandler(Controller& controller, std::string src,
+                            std::string dst, std::string application) {
+  return 0; // TODO
+
+}
+
+void connectionDestroyHandler(Controller& controller, int connection_fd) {
+
+}
+

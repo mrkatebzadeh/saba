@@ -27,61 +27,61 @@
 #include "controller.h"
 #include "controller_args.h"
 
-Controller controller;
-
 int main(int argc, char **argv) {
-  spdlog::info("Controller started.");
+    Controller controller;
+    spdlog::info("Controller started.");
 
-  auto config = parseOpts(argc, argv);
+    auto config = parseOpts(argc, argv);
 
-  rpc::server rpc_server(config.port);
+    rpc::server rpc_server(config.port);
 
-  controller.available_pls = config.available_pls;
-  controller.available_qs = config.available_qs;
+    controller.available_pls = config.available_pls;
+    controller.available_qs  = config.available_qs;
 
-  if (config.algorithm == "ib") {
-    controller.algorithm = AllocationAlgorithm::IB;
-  } else if (config.algorithm == "idealmaxmin") {
-    controller.algorithm = AllocationAlgorithm::IDEALMAXMIN;
-  } else if (config.algorithm == "bestfitsmart") {
-    controller.algorithm = AllocationAlgorithm::BESTFITSMART;
-  } else if (config.algorithm == "hierarchicalsmart") {
-    controller.algorithm = AllocationAlgorithm::HIERARCHICALSMART;
-  } else if (config.algorithm == "idealsmart") {
-    controller.algorithm = AllocationAlgorithm::IDEALSMART;
-  } else {
-    controller.algorithm = AllocationAlgorithm::IB;
-  }
+    if (config.algorithm == "ib") {
+        controller.algorithm = AllocationAlgorithm::IB;
+    } else if (config.algorithm == "idealmaxmin") {
+        controller.algorithm = AllocationAlgorithm::IDEALMAXMIN;
+    } else if (config.algorithm == "bestfitsmart") {
+        controller.algorithm = AllocationAlgorithm::BESTFITSMART;
+    } else if (config.algorithm == "hierarchicalsmart") {
+        controller.algorithm = AllocationAlgorithm::HIERARCHICALSMART;
+    } else if (config.algorithm == "idealsmart") {
+        controller.algorithm = AllocationAlgorithm::IDEALSMART;
+    } else {
+        controller.algorithm = AllocationAlgorithm::IB;
+    }
 
-  spdlog::info("Loading profile table from {} ...", config.profile_table_file);
-  controller.loadProfileTable(config.profile_table_file);
+    spdlog::info(
+        "Loading profile table from {} ...", config.profile_table_file);
+    controller.loadProfileTable(config.profile_table_file);
 
-  spdlog::info("Generating slowdoan table...");
-  controller.generateSlowdownTable();
+    spdlog::info("Generating slowdoan table...");
+    controller.generateSlowdownTable();
 
-  spdlog::info("Generating sensitivity table...");
-  controller.generateSensitivityTable();
+    spdlog::info("Generating sensitivity table...");
+    controller.generateSensitivityTable();
 
-  spdlog::info("Clustering applications...");
-  controller.clusterApplications();
+    spdlog::info("Clustering applications...");
+    controller.clusterApplications();
 
-  spdlog::info("Clustering SLs...");
-  controller.clusterPriorityLevels();
+    spdlog::info("Clustering SLs...");
+    controller.clusterPriorityLevels();
 
-  spdlog::info("Serving ...");
-  rpc_server.bind("app_register", [](std::string application_name) {
-    return appRegisterHandler(&controller, application_name);
-  });
+    spdlog::info("Serving ...");
+    rpc_server.bind("app_register", [&controller](std::string application_name) {
+        return appRegisterHandler(controller, application_name);
+    });
 
-  rpc_server.bind("connection_create", [](std::string src, std::string dst,
-                                          std::string application_name) {
-    return connectionCreateHandler(&controller, src, dst, application_name);
-  });
+    rpc_server.bind("connection_create", [&controller](std::string src, std::string dst,
+                                             std::string application_name) {
+        return connectionCreateHandler(controller, src, dst, application_name);
+    });
 
-  rpc_server.bind("connection_destroy", [](int connection_fd) {
-    connectionDestroyHandler(&controller, connection_fd);
-  });
+    rpc_server.bind("connection_destroy", [&controller](int connection_fd) {
+        connectionDestroyHandler(controller, connection_fd);
+    });
 
-  rpc_server.run();
-  return 0;
+    rpc_server.run();
+    return 0;
 }

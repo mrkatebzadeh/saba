@@ -183,3 +183,30 @@ int Controller::calculatePriorityLevelsByHierarchicalSmart(
 int Controller::calculatePriorityLevelsByIdealSmart(uint32_t application_fd) {
   return 0;  // TODO
 }
+
+std::ostream& operator<<(std::ostream& os, const Connection& obj) {
+  os << obj.src << ',' << obj.dst << ',' << obj.application;
+  return os;
+}
+
+std::ostream& operator<<(std::ostream& os, const IBSwitch& obj) {
+  os << obj.id << ',' << obj.high_config << ',' << obj.low_config << '[';
+  for (const auto& keyvalue : obj.connections) {
+    os << keyvalue.second << ',';
+  }
+  os << ']';
+  return os;
+}
+
+std::ostream& operator<<(std::ostream& os, const ProfileRecord& obj) {
+  os << obj.app << ',' << obj.bw << ',' << obj.slowdown << ',' << obj.time;
+  return os;
+}
+
+std::ostream& operator<<(std::ostream& os,
+                         const BandwidthAllocationRecord& obj) {
+  os << obj.app << ',' << obj.bw << ',' << obj.src << ',' << obj.dst << ','
+     << obj.pl;
+  return os;
+}
+

@@ -53,11 +53,6 @@ class ProfileRecord {
   friend std::ostream& operator<<(std::ostream& os, const ProfileRecord& obj);
 };
 
-std::ostream& operator<<(std::ostream& os, const ProfileRecord& obj) {
-  os << obj.app << ',' << obj.bw << ',' << obj.slowdown << ',' << obj.time;
-  return os;
-}
-
 class BandwidthAllocationRecord {
  public:
   std::uint32_t app;
@@ -69,13 +64,6 @@ class BandwidthAllocationRecord {
                                   const BandwidthAllocationRecord& obj);
 };
 
-std::ostream& operator<<(std::ostream& os,
-                         const BandwidthAllocationRecord& obj) {
-  os << obj.app << ',' << obj.bw << ',' << obj.src << ',' << obj.dst << ','
-     << obj.pl;
-  return os;
-}
-
 class Connection {
  public:
   std::string src;
@@ -83,11 +71,6 @@ class Connection {
   std::string application;
   friend std::ostream& operator<<(std::ostream& os, const Connection& obj);
 };
-
-std::ostream& operator<<(std::ostream& os, const Connection& obj) {
-  os << obj.src << ',' << obj.dst << ',' << obj.application;
-  return os;
-}
 
 class IBSwitch {
  public:
@@ -97,15 +80,6 @@ class IBSwitch {
   std::map<int, Connection> connections;
   friend std::ostream& operator<<(std::ostream& os, const IBSwitch& obj);
 };
-
-std::ostream& operator<<(std::ostream& os, const IBSwitch& obj) {
-  os << obj.id << ',' << obj.high_config << ',' << obj.low_config << '[';
-  for (const auto& keyvalue : obj.connections) {
-    os << keyvalue.second << ',';
-  }
-  os << ']';
-  return os;
-}
 
 class Controller {
  public:

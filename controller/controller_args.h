@@ -27,7 +27,7 @@
 #include <iostream>
 #include <string>
 
-#define IBMAXSLVL 8
+#define IB_MAX_SLVL 8
 
 class ControllerConfig {
  public:
@@ -38,14 +38,14 @@ class ControllerConfig {
   std::string algorithm;
   std::string profile_table_file;
 
-  friend std::ostream &operator<<(std::ostream &strm,
-                                  ControllerConfig const &a) {
+  friend std::ostream& operator<<(std::ostream& strm,
+                                  ControllerConfig const& a) {
     return strm << "Config( SLs:" << a.available_pls
                 << ", VLs: " << a.available_qs << ", algorithm: " << a.algorithm
                 << " )";
   }
 };
 
-ControllerConfig parseOpts(int argc, char **argv);
+ControllerConfig parseOpts(int argc, char** argv);
 
 #endif

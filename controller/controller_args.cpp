@@ -24,14 +24,14 @@
 
 #include "controller.h"
 
-ControllerConfig parseOpts(int argc, char **argv) {
+ControllerConfig parseOpts(int argc, char** argv) {
   int c;
-  auto config = ControllerConfig();
-  config.algorithm = std::string("hierarchicalsmart");
-  config.port = 8585;
-  config.verbose = true;
-  config.available_pls = IBMAXSLVL;
-  config.available_qs = IBMAXSLVL;
+  auto config               = ControllerConfig();
+  config.algorithm          = std::string("hierarchicalsmart");
+  config.port               = 8585;
+  config.verbose            = true;
+  config.available_pls      = IB_MAX_SLVL;
+  config.available_qs       = IB_MAX_SLVL;
   config.profile_table_file = std::string("./profile_table.csv");
 
   while (1) {
@@ -48,13 +48,16 @@ ControllerConfig parseOpts(int argc, char **argv) {
 
     c = getopt_long(argc, argv, "vp:a:t:V:S:", long_options, &option_index);
 
-    if (c == -1) break;
+    if (c == -1)
+      break;
 
     switch (c) {
       case 0:
-        if (long_options[option_index].flag != 0) break;
+        if (long_options[option_index].flag != 0)
+          break;
         std::printf("option %s", long_options[option_index].name);
-        if (optarg) std::printf(" with arg %s", optarg);
+        if (optarg)
+          std::printf(" with arg %s", optarg);
         std::printf("\n");
         break;
 

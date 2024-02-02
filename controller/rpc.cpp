@@ -23,8 +23,8 @@
 
 #include "controller.h"
 
-int appRegisterHandler(Controller *controller, std::string application_name) {
-  int sl = 0;
+int appRegisterHandler(Controller* controller, std::string application_name) {
+  int sl              = 0;
   auto application_fd = controller->name_to_app_table[application_name];
 
   switch (controller->algorithm) {
@@ -52,10 +52,10 @@ int appRegisterHandler(Controller *controller, std::string application_name) {
   return sl;
 }
 
-int connectionCreateHandler(Controller *controller, std::string src,
+int connectionCreateHandler(Controller* controller, std::string src,
                             std::string dst, std::string application) {
   // TODO
 }
-void connectionDestroyHandler(Controller *controller, int connection_fd) {
+void connectionDestroyHandler(Controller* controller, int connection_fd) {
   // TODO
 }

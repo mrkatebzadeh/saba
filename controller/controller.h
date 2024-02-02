@@ -26,8 +26,8 @@
 #include <math.h>
 #include <nlopt.h>
 #include <rpc/server.h>
-#include <spdlog/spdlog.h>
 #include <spdlog/fmt/ostr.h>
+#include <spdlog/spdlog.h>
 #include <cstdint>
 #include <map>
 #include <vector>
@@ -38,10 +38,10 @@ enum class TargetType { TARGET_HCA = 0, TARGET_SWITCH = 1 };
 
 enum class AllocationAlgorithm {
   IB,
-  IDEALMAXMIN,
-  BESTFITSMART,
-  HIERARCHICALSMART,
-  IDEALSMART
+  IDEAL_MAX_MIN,
+  BEST_FIT_SMART,
+  HIERARCHICAL_SMART,
+  IDEAL_SMART
 };
 
 class ProfileRecord {

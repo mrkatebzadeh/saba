@@ -12,6 +12,7 @@ async-trait.workspace = true
 local-ip-address.workspace = true
 tokio.workspace = true
 tonic.workspace = true
+tonic-prost.workspace = true
 prost.workspace = true
 thiserror.workspace = true
 nalgebra.workspace = true
@@ -20,4 +21,4 @@ nalgebra.workspace = true
 tempfile.workspace = true
 
 [build-dependencies]
-tonic-build = "0.8.4"
+tonic-prost-build = "0.14.3"

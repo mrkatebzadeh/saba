@@ -6,15 +6,15 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
         .expect("workspace root")
         .join("protos");
 
-    let protos = ["init.proto", "register.proto", "connection.proto"]
+    let protos: Vec<_> = ["init.proto", "register.proto", "connection.proto"]
         .into_iter()
         .map(|file| proto_root.join(file))
-        .collect::<Vec<_>>();
+        .collect();
 
-    tonic_build::configure().compile(
-        &protos.iter().map(|path| path.as_path()).collect::<Vec<_>>(),
-        &[proto_root],
-    )?;
+    let proto_refs: Vec<_> = protos.iter().map(|path| path.as_path()).collect();
+
+    let include_dirs = [proto_root.as_path()];
+    tonic_prost_build::configure().compile_protos(&proto_refs, &include_dirs)?;
 
     Ok(())
 }

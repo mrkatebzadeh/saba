@@ -22,9 +22,9 @@
 use std::fmt::Debug;
 
 pub trait NetworkNode {
-    fn name(&self) -> String;
-    fn ip(&self) -> String;
-    fn weights(&self) -> Vec<u16>;
+    fn name(&self) -> &str;
+    fn ip(&self) -> &str;
+    fn weights(&self) -> &[u16];
 }
 
 impl Debug for dyn NetworkNode {
@@ -50,16 +50,16 @@ impl Server {
 }
 
 impl NetworkNode for Server {
-    fn name(&self) -> String {
-        self.name.clone()
+    fn name(&self) -> &str {
+        &self.name
     }
 
-    fn ip(&self) -> String {
-        self.ip.clone()
+    fn ip(&self) -> &str {
+        &self.ip
     }
 
-    fn weights(&self) -> Vec<u16> {
-        self.weights.clone()
+    fn weights(&self) -> &[u16] {
+        &self.weights
     }
 }
 
@@ -84,17 +84,18 @@ impl Switch {
         }
     }
 }
+
 impl NetworkNode for Switch {
-    fn name(&self) -> String {
-        self.name.clone()
+    fn name(&self) -> &str {
+        &self.name
     }
 
-    fn ip(&self) -> String {
-        self.ip.clone()
+    fn ip(&self) -> &str {
+        &self.ip
     }
 
-    fn weights(&self) -> Vec<u16> {
-        self.weights.clone()
+    fn weights(&self) -> &[u16] {
+        &self.weights
     }
 }
 
@@ -107,7 +108,7 @@ mod tests {
         let server = Server::new("server1", "127.0.0.1", vec![1, 2, 3]);
         assert_eq!(server.name(), "server1");
         assert_eq!(server.ip(), "127.0.0.1");
-        assert_eq!(server.weights(), vec![1, 2, 3]);
+        assert_eq!(server.weights(), &[1, 2, 3]);
     }
 
     #[test]
@@ -115,7 +116,8 @@ mod tests {
         let switch = Switch::new("switch1", "127.0.0.1", 4, vec![1, 2, 3]);
         assert_eq!(switch.name(), "switch1");
         assert_eq!(switch.ip(), "127.0.0.1");
-        assert_eq!(switch.weights(), vec![1, 2, 3]);
+        assert_eq!(switch.weights(), &[1, 2, 3]);
+        assert_eq!(switch.number_of_ports, 4);
     }
 }
 

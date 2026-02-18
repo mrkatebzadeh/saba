@@ -21,4 +21,4 @@ nalgebra.workspace = true
 tempfile.workspace = true
 
 [build-dependencies]
-tonic-prost-build = "0.14.3"
+tonic-prost-build = "0.14.4"

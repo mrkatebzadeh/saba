@@ -10,6 +10,10 @@ on:
       - '**/Cargo.lock'
   pull_request:
 
+permissions:
+  contents: read
+  checks: write
+
 jobs:
   audit:
     runs-on: ubuntu-latest
@@ -27,4 +31,3 @@ jobs:
       - uses: actions-rs/audit-check@v1
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
-
